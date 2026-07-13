@@ -3,8 +3,8 @@
  *
  * Design rule: ALL human-facing status/progress/diagnostic text goes to
  * stderr. stdout is reserved for machine-consumable report output (--json /
- * --markdown / default terminal report) so Patronus can be safely piped, e.g.
- *   patronus scan --json > report.json
+ * --markdown / default terminal report) so Clipeus can be safely piped, e.g.
+ *   clipeus scan --json > report.json
  * without progress noise corrupting the payload.
  */
 

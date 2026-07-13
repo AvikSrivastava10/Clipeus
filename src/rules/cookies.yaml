@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-insecure-cookie-httponly-false
+  - id: clipeus-insecure-cookie-httponly-false
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -7,9 +7,9 @@ rules:
       JavaScript. Session/auth cookies should be HttpOnly so XSS cannot steal
       them.
     metadata:
-      patronus-category: insecure-cookie-flags
-      patronus-ai-codegen: true
-      patronus-remediation: "Set httpOnly: true on session/auth cookies."
+      clipeus-category: insecure-cookie-flags
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Set httpOnly: true on session/auth cookies."
       cwe:
         - "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"
       confidence: HIGH
@@ -18,7 +18,7 @@ rules:
           - pattern: '$RES.cookie($NAME, $VAL, {..., httpOnly: false, ...})'
           - pattern: 'session({..., cookie: {..., httpOnly: false, ...}, ...})'
 
-  - id: patronus-insecure-cookie-secure-false
+  - id: clipeus-insecure-cookie-secure-false
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -26,9 +26,9 @@ rules:
       HTTP and intercepted. Session/auth cookies should set Secure so they are
       only sent over HTTPS.
     metadata:
-      patronus-category: insecure-cookie-flags
-      patronus-ai-codegen: true
-      patronus-remediation: "Set secure: true (and serve over HTTPS)."
+      clipeus-category: insecure-cookie-flags
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Set secure: true (and serve over HTTPS)."
       cwe:
         - "CWE-614: Sensitive Cookie Without 'Secure' Attribute"
       confidence: MEDIUM
@@ -37,16 +37,16 @@ rules:
           - pattern: '$RES.cookie($NAME, $VAL, {..., secure: false, ...})'
           - pattern: 'session({..., cookie: {..., secure: false, ...}, ...})'
 
-  - id: patronus-insecure-cookie-flask
+  - id: clipeus-insecure-cookie-flask
     languages: [python]
     severity: WARNING
     message: >-
       A Flask session/response cookie disables HttpOnly or Secure. This exposes
       the cookie to client-side scripts or plain-HTTP interception.
     metadata:
-      patronus-category: insecure-cookie-flags
-      patronus-ai-codegen: true
-      patronus-remediation: "Set SESSION_COOKIE_HTTPONLY=True and SESSION_COOKIE_SECURE=True."
+      clipeus-category: insecure-cookie-flags
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Set SESSION_COOKIE_HTTPONLY=True and SESSION_COOKIE_SECURE=True."
       cwe:
         - "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"
       confidence: HIGH

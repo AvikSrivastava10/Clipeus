@@ -1,9 +1,9 @@
 /**
- * .patronusignore parsing + suppression.
+ * .clipeusignore parsing + suppression.
  *
  * Syntax is gitignore-like, with three suppression dimensions:
  *   - path globs (default):      src/legacy/**, *.min.js, /vendor/
- *   - rule ids:                  rule:semgrep.xxx   or   rule:patronus.jwt.*
+ *   - rule ids:                  rule:semgrep.xxx   or   rule:clipeus.jwt.*
  *   - categories:                category:secrets
  *
  * Lines starting with `#` are comments; blank lines are ignored. Path patterns
@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { normalizePath } from '../core/finding.js';
 
-const IGNORE_FILENAME = '.patronusignore';
+const IGNORE_FILENAME = '.clipeusignore';
 
 /** Convert a single glob segment string into a regex body (path-aware). */
 function globToRegexBody(pattern) {
@@ -169,7 +169,7 @@ export class SuppressionSet {
 }
 
 /**
- * Load .patronusignore from `cwd` (if present) and merge with any extra
+ * Load .clipeusignore from `cwd` (if present) and merge with any extra
  * patterns from config. Never throws.
  * @param {string} cwd
  * @param {string[]} extraPatterns

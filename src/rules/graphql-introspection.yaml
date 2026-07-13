@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-graphql-introspection-enabled
+  - id: clipeus-graphql-introspection-enabled
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -7,9 +7,9 @@ rules:
       production this lets anyone enumerate your entire schema, easing attack
       planning. Gate introspection behind a non-production environment check.
     metadata:
-      patronus-category: insecure-config
-      patronus-ai-codegen: true
-      patronus-remediation: "introspection: process.env.NODE_ENV !== 'production'."
+      clipeus-category: insecure-config
+      clipeus-ai-codegen: true
+      clipeus-remediation: "introspection: process.env.NODE_ENV !== 'production'."
       cwe:
         - "CWE-200: Exposure of Sensitive Information to an Unauthorized Actor"
       confidence: MEDIUM

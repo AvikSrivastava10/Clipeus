@@ -1,15 +1,15 @@
 /**
- * Programmatic API for Patronus.
+ * Programmatic API for Clipeus.
  *
- * Lets other tools embed Patronus (e.g. custom CI scripts) without shelling out
- * to the CLI. The CLI in bin/patronus.js is a thin wrapper over these exports.
+ * Lets other tools embed Clipeus (e.g. custom CI scripts) without shelling out
+ * to the CLI. The CLI in bin/clipeus.js is a thin wrapper over these exports.
  */
 
 export { runScan, selectAnalyzers, allSelectableIds } from './scan/engine.js';
 export { renderReport, FORMATS } from './report/index.js';
 export { detectProject } from './detectors/detect.js';
 export { loadConfig, getDefaultConfig } from './config/config.js';
-export { loadSuppressions } from './config/patronusignore.js';
+export { loadSuppressions } from './config/clipeusignore.js';
 export {
   createFinding,
   fingerprintFinding,

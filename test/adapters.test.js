@@ -10,12 +10,12 @@ import owasp from '../src/adapters/owasp-dependency-check.js';
 import eslint from '../src/adapters/eslint.js';
 
 describe('semgrep.normalize', () => {
-  it('maps severity, honors patronus metadata tags', () => {
+  it('maps severity, honors clipeus metadata tags', () => {
     const raw = {
       version: '1.50.0',
       results: [
         {
-          check_id: 'patronus.jwt.none-algorithm',
+          check_id: 'clipeus.jwt.none-algorithm',
           path: 'src/auth.js',
           start: { line: 12, col: 3 },
           end: { line: 12 },
@@ -23,8 +23,8 @@ describe('semgrep.normalize', () => {
             message: 'JWT verification disabled',
             severity: 'ERROR',
             metadata: {
-              'patronus-category': 'insecure-jwt',
-              'patronus-ai-codegen': true,
+              'clipeus-category': 'insecure-jwt',
+              'clipeus-ai-codegen': true,
               references: ['https://cwe.mitre.org/data/definitions/347.html'],
             },
           },

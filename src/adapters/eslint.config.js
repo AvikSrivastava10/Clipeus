@@ -1,11 +1,11 @@
 /**
- * Bundled ESLint flat config used by Patronus's ESLint adapter.
+ * Bundled ESLint flat config used by Clipeus's ESLint adapter.
  *
  * This is intentionally self-contained: it registers ONLY the security-focused
  * plugins (eslint-plugin-security, eslint-plugin-no-unsanitized) and enables
- * their rules. Patronus points ESLint at this file with `overrideConfigFile`,
+ * their rules. Clipeus points ESLint at this file with `overrideConfigFile`,
  * so results are independent of whatever ESLint config the target project has
- * (or lacks). Plugins resolve from Patronus's own node_modules.
+ * (or lacks). Plugins resolve from Clipeus's own node_modules.
  *
  * Nothing here modifies user code: ESLint is run in lint-only mode.
  */

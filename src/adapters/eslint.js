@@ -2,7 +2,7 @@
  * ESLint adapter (MIT), configured with security plugins.
  *
  * Unlike the other adapters, ESLint (and the security plugins) are bundled as
- * Patronus dependencies and executed through ESLint's Node API using a
+ * Clipeus dependencies and executed through ESLint's Node API using a
  * self-contained flat config. This guarantees the security rules actually run,
  * regardless of the target project's own ESLint setup. It is strictly
  * lint-only: no --fix, no file writes.
@@ -58,7 +58,7 @@ const adapter = {
   license: 'MIT',
   homepage: 'https://eslint.org',
   install: {
-    recommended: 'bundled with Patronus (no separate install required)',
+    recommended: 'bundled with Clipeus (no separate install required)',
   },
 
   /**

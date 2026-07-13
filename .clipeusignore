@@ -1,4 +1,4 @@
-# Patronus's own suppression file (gitignore-style).
+# Clipeus's own suppression file (gitignore-style).
 #
 # Syntax:
 #   path glob         e.g.  src/legacy/**   or   *.min.js

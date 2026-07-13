@@ -56,7 +56,7 @@ const checker = {
       findings.push(
         createFinding({
           tool: TOOL.rateLimitChecker,
-          ruleId: 'patronus.missing-rate-limit',
+          ruleId: 'clipeus.missing-rate-limit',
           severity: SEVERITY.medium,
           category: CATEGORY.missingRateLimit,
           file: route.file,

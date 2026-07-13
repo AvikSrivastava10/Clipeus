@@ -74,7 +74,7 @@ function analyzeFile(rel, code) {
       findings.push(
         createFinding({
           tool: TOOL.taint,
-          ruleId: `patronus.taint.${sink.category}`,
+          ruleId: `clipeus.taint.${sink.category}`,
           severity: SEVERITY.high,
           category: sink.category,
           file: rel,

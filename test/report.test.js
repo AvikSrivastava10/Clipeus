@@ -4,7 +4,7 @@ import { renderReport } from '../src/report/index.js';
 
 function fakeScan(overrides = {}) {
   const findings = overrides.findings || [
-    createFinding({ tool: 'semgrep', ruleId: 'patronus.jwt.none', file: 'src/auth.js', line: 12, category: 'insecure-jwt', severity: 'critical', confidence: 'high', aiCodegenRelevant: true, message: 'JWT alg none', remediation: 'verify signature' }),
+    createFinding({ tool: 'semgrep', ruleId: 'clipeus.jwt.none', file: 'src/auth.js', line: 12, category: 'insecure-jwt', severity: 'critical', confidence: 'high', aiCodegenRelevant: true, message: 'JWT alg none', remediation: 'verify signature' }),
     createFinding({ tool: 'eslint', ruleId: 'security/detect-child-process', file: 'src/run.js', line: 3, category: 'injection', severity: 'high', confidence: 'medium', message: 'child_process' }),
   ];
   return {
@@ -32,7 +32,7 @@ describe('json reporter', () => {
   it('produces valid JSON with the unified findings array and metadata', () => {
     const text = renderReport(fakeScan(), { format: 'json' });
     const obj = JSON.parse(text);
-    expect(obj.tool).toBe('patronus');
+    expect(obj.tool).toBe('clipeus');
     expect(obj.failed).toBe(true);
     expect(obj.failOn).toBe('high');
     expect(Array.isArray(obj.findings)).toBe(true);

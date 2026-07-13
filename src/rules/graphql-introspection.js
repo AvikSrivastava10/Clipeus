@@ -1,9 +1,9 @@
 const { ApolloServer } = require('@apollo/server');
 
-// ruleid: patronus-graphql-introspection-enabled
+// ruleid: clipeus-graphql-introspection-enabled
 const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
 
-// ok: patronus-graphql-introspection-enabled
+// ok: clipeus-graphql-introspection-enabled
 const safeServer = new ApolloServer({
   typeDefs,
   resolvers,

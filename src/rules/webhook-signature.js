@@ -2,7 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const app = express();
 
-// ruleid: patronus-webhook-missing-signature-verification
+// ruleid: clipeus-webhook-missing-signature-verification
 app.post('/webhook/stripe', (req, res) => {
   const event = req.body;
   processEvent(event);
@@ -14,7 +14,7 @@ app.post('/webhook/github', (req, res) => {
   const sig = req.headers['x-hub-signature-256'];
   const hmac = crypto.createHmac('sha256', process.env.SECRET);
   const digest = 'sha256=' + hmac.update(req.rawBody).digest('hex');
-  // ok: patronus-webhook-missing-signature-verification
+  // ok: clipeus-webhook-missing-signature-verification
   if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(digest))) {
     return res.sendStatus(401);
   }
@@ -23,7 +23,7 @@ app.post('/webhook/github', (req, res) => {
 });
 
 // A non-webhook route is not the target of this rule.
-// ok: patronus-webhook-missing-signature-verification
+// ok: clipeus-webhook-missing-signature-verification
 app.post('/users', (req, res) => {
   createUser(req.body);
   res.sendStatus(201);

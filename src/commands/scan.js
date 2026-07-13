@@ -1,5 +1,5 @@
 /**
- * `patronus scan [path]` command.
+ * `clipeus scan [path]` command.
  *
  * Runs all applicable analyzers, prints a report in the requested format, and
  * sets the process exit code per the --fail-on threshold.
@@ -113,7 +113,7 @@ export async function scanCommand(pathArg, opts = {}) {
     const s = scan.summary;
     log.info(
       chalk.gray(
-        `patronus: ${s.total} finding(s) — ${s.bySeverity.critical} critical, ${s.bySeverity.high} high, ${s.bySeverity.medium} medium, ${s.bySeverity.low} low.`,
+        `clipeus: ${s.total} finding(s) — ${s.bySeverity.critical} critical, ${s.bySeverity.high} high, ${s.bySeverity.medium} medium, ${s.bySeverity.low} low.`,
       ),
     );
   }

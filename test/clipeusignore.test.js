@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseIgnoreLines } from '../src/config/patronusignore.js';
+import { parseIgnoreLines } from '../src/config/clipeusignore.js';
 import { createFinding } from '../src/index.js';
 
 function f(overrides) {

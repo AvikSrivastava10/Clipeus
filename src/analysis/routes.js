@@ -20,7 +20,7 @@ import { log } from '../core/logger.js';
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'delete', 'patch', 'all', 'head', 'options']);
 const JS_EXTS = ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'];
 const PY_EXTS = ['.py'];
-const ANALYSIS_KEY = Symbol.for('patronus.routeAnalysis');
+const ANALYSIS_KEY = Symbol.for('clipeus.routeAnalysis');
 
 /** @typedef {{ framework:string, method:string, path:string, file:string, line:number|null, guards:string[] }} Route */
 

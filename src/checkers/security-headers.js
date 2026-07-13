@@ -41,7 +41,7 @@ const checker = {
     const file = analysis.routes[0]?.file || '';
     const finding = createFinding({
       tool: TOOL.securityHeadersChecker,
-      ruleId: 'patronus.missing-security-headers',
+      ruleId: 'clipeus.missing-security-headers',
       severity: SEVERITY.medium,
       category: CATEGORY.missingSecurityHeaders,
       file,
@@ -50,7 +50,7 @@ const checker = {
       confidence: CONFIDENCE.medium,
       aiCodegenRelevant: true,
       remediation:
-        'Add a security-headers layer: `app.use(helmet())` (Express) or flask-talisman (Flask). Configure CSP and HSTS explicitly. If headers are set at a reverse proxy/CDN, suppress this via .patronusignore.',
+        'Add a security-headers layer: `app.use(helmet())` (Express) or flask-talisman (Flask). Configure CSP and HSTS explicitly. If headers are set at a reverse proxy/CDN, suppress this via .clipeusignore.',
       references: ['https://owasp.org/www-project-secure-headers/'],
     });
 

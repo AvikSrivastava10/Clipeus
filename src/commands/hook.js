@@ -1,7 +1,7 @@
 /**
- * `patronus hook enable|disable` command.
+ * `clipeus hook enable|disable` command.
  *
- * enable  -> installs a pre-push hook running `patronus scan --fail-on=<threshold>`
+ * enable  -> installs a pre-push hook running `clipeus scan --fail-on=<threshold>`
  * disable -> removes the managed hook block, preserving any other hook content
  */
 
@@ -32,7 +32,7 @@ export function hookEnableCommand(opts = {}) {
     const result = enableHook(root, { threshold });
     const rel = path.relative(root, result.path) || result.path;
     log.success(`Pre-push hook ${result.action} (${result.kind}) at ${rel}`);
-    log.info(chalk.gray(`   runs: patronus scan --fail-on=${threshold}`));
+    log.info(chalk.gray(`   runs: clipeus scan --fail-on=${threshold}`));
   } catch (err) {
     log.error(`Could not enable hook: ${err.message}`);
     process.exitCode = 2;
@@ -46,13 +46,13 @@ export function hookDisableCommand() {
     const rel = path.relative(root, result.path) || result.path;
     switch (result.action) {
       case 'removed':
-        log.success(`Removed Patronus block from existing hook at ${rel}.`);
+        log.success(`Removed Clipeus block from existing hook at ${rel}.`);
         break;
       case 'file-deleted':
         log.success(`Removed pre-push hook at ${rel}.`);
         break;
       case 'not-present':
-        log.info('No Patronus-managed block found in the pre-push hook; nothing to remove.');
+        log.info('No Clipeus-managed block found in the pre-push hook; nothing to remove.');
         break;
       case 'not-found':
       default:

@@ -7,7 +7,7 @@ import { TOOL } from '../src/constants.js';
 
 let dir;
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'patronus-detect-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'clipeus-detect-'));
 });
 afterEach(() => {
   fs.rmSync(dir, { recursive: true, force: true });

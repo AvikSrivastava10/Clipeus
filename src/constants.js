@@ -1,5 +1,5 @@
 /**
- * Shared constants for Patronus.
+ * Shared constants for Clipeus.
  *
  * These define the canonical vocabulary that every layer (adapters, checkers,
  * taint tracker, reporting) normalizes into. Keeping them in one place ensures
@@ -71,7 +71,7 @@ export const CATEGORY_VALUES = Object.freeze(Object.values(CATEGORY));
 
 /**
  * Canonical tool / check identifiers used in the `tool` field of findings.
- * External scanners plus the internal Patronus checkers/engines.
+ * External scanners plus the internal Clipeus checkers/engines.
  */
 export const TOOL = Object.freeze({
   semgrep: 'semgrep',
@@ -83,11 +83,11 @@ export const TOOL = Object.freeze({
   bandit: 'bandit',
   trivy: 'trivy',
   owaspDependencyCheck: 'owasp-dependency-check',
-  // Internal Patronus detection layers:
-  authChecker: 'patronus-auth',
-  rateLimitChecker: 'patronus-rate-limit',
-  securityHeadersChecker: 'patronus-security-headers',
-  taint: 'patronus-taint',
+  // Internal Clipeus detection layers:
+  authChecker: 'clipeus-auth',
+  rateLimitChecker: 'clipeus-rate-limit',
+  securityHeadersChecker: 'clipeus-security-headers',
+  taint: 'clipeus-taint',
 });
 
 /** Default per-tool subprocess timeout in milliseconds. */
@@ -103,4 +103,4 @@ export const MARKERS = Object.freeze({
   dotnet: ['*.csproj', '*.sln', '*.vbproj', '*.fsproj'],
 });
 
-export const PRODUCT_NAME = 'Patronus';
+export const PRODUCT_NAME = 'Clipeus';

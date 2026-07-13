@@ -1,5 +1,5 @@
 /**
- * `patronus doctor` command.
+ * `clipeus doctor` command.
  *
  * Diagnostic only — never modifies anything. Reports the runtime, which
  * underlying tools are installed and runnable (with versions), and what a scan
@@ -43,7 +43,7 @@ export async function doctorCommand(opts = {}) {
   out.push(chalk.bold('Security tools'));
   let missing = 0;
   for (const adapter of ALL_ADAPTERS) {
-    // Bundled adapters (ESLint) have a custom runner and ship with Patronus.
+    // Bundled adapters (ESLint) have a custom runner and ship with Clipeus.
     if (typeof adapter.runCustom === 'function') {
       let bundledVersion = null;
       try {
@@ -90,7 +90,7 @@ export async function doctorCommand(opts = {}) {
   }
 
   if (missing > 0) {
-    out.push(chalk.yellow(`${missing} tool(s) not installed. Patronus will skip them and scan with the rest.`));
+    out.push(chalk.yellow(`${missing} tool(s) not installed. Clipeus will skip them and scan with the rest.`));
   } else {
     out.push(chalk.green('All supported tools are installed.'));
   }

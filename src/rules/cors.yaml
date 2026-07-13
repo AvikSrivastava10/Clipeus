@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-cors-wildcard-origin
+  - id: clipeus-cors-wildcard-origin
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -8,9 +8,9 @@ rules:
       credentials it can expose authenticated data. Restrict allowed origins to
       an explicit allowlist.
     metadata:
-      patronus-category: cors-misconfig
-      patronus-ai-codegen: true
-      patronus-remediation: >-
+      clipeus-category: cors-misconfig
+      clipeus-ai-codegen: true
+      clipeus-remediation: >-
         Replace the wildcard with an explicit list of trusted origins, e.g.
         cors({ origin: ["https://app.example.com"] }).
       cwe:
@@ -28,7 +28,7 @@ rules:
           - pattern: 'cors({..., origin: "*", ...})'
           - pattern: 'cors({..., origin: true, ...})'
 
-  - id: patronus-cors-wildcard-origin-python
+  - id: clipeus-cors-wildcard-origin-python
     languages: [python]
     severity: WARNING
     message: >-
@@ -36,9 +36,9 @@ rules:
       no origins are specified, allowing any website to call your API. Restrict
       allowed origins to an explicit allowlist.
     metadata:
-      patronus-category: cors-misconfig
-      patronus-ai-codegen: true
-      patronus-remediation: >-
+      clipeus-category: cors-misconfig
+      clipeus-ai-codegen: true
+      clipeus-remediation: >-
         Pass an explicit origins list, e.g. CORS(app, origins=["https://app.example.com"]).
       cwe:
         - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"

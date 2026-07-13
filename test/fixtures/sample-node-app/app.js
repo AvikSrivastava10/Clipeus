@@ -1,4 +1,4 @@
-// Intentionally vulnerable sample for Patronus end-to-end tests.
+// Intentionally vulnerable sample for Clipeus end-to-end tests.
 // This file is NOT production code. Do not copy these patterns.
 
 const express = require('express');

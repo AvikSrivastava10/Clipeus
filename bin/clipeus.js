@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Patronus CLI entrypoint.
+ * Clipeus CLI entrypoint.
  *
  * Wires the commander program to the command implementations in src/commands.
  * Command set is intentionally fixed for v1: init, scan, hook enable|disable,
@@ -23,7 +23,7 @@ import { VERSION, PRODUCT } from '../src/version.js';
 const program = new Command();
 
 program
-  .name('patronus')
+  .name('clipeus')
   .description(
     `${PRODUCT} — free, read-only security & vulnerability auditing for your project.\n` +
       'Orchestrates open-source scanners and adds custom detection for gaps common in\n' +
@@ -52,7 +52,7 @@ program
   .option('--output <file>', 'write the report to a file instead of stdout')
   .addHelpText(
     'after',
-    `\nAvailable tools/checks for --only/--skip:\n  ${allSelectableIds().join(', ')}\n\nExamples:\n  $ patronus scan\n  $ patronus scan ./services/api --fail-on=high\n  $ patronus scan --json --output report.json\n  $ patronus scan --only=semgrep,gitleaks --markdown`,
+    `\nAvailable tools/checks for --only/--skip:\n  ${allSelectableIds().join(', ')}\n\nExamples:\n  $ clipeus scan\n  $ clipeus scan ./services/api --fail-on=high\n  $ clipeus scan --json --output report.json\n  $ clipeus scan --only=semgrep,gitleaks --markdown`,
   )
   .action(async (pathArg, opts) => {
     await scanCommand(pathArg, opts);
@@ -72,7 +72,7 @@ hook
 
 hook
   .command('disable')
-  .description('remove the Patronus pre-push hook (preserves other hook content)')
+  .description('remove the Clipeus pre-push hook (preserves other hook content)')
   .action(() => {
     hookDisableCommand();
   });

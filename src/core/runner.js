@@ -38,7 +38,7 @@ function assertReadOnlyArgs(command, args) {
     for (const pattern of FORBIDDEN_ARG_PATTERNS) {
       if (pattern.test(arg)) {
         throw new Error(
-          `Refusing to run "${command} ${arg}": Patronus is strictly read-only and never invokes fix/write modes.`,
+          `Refusing to run "${command} ${arg}": Clipeus is strictly read-only and never invokes fix/write modes.`,
         );
       }
     }

@@ -210,7 +210,7 @@ function resolveRelative(source, fromRel, fileSet) {
 /**
  * Analyze the whole project for JS/TS taint.
  * @param {string} root
- * @param {object} config  Patronus config (uses config.taint).
+ * @param {object} config  Clipeus config (uses config.taint).
  * @returns {object[]} findings
  */
 export function analyzeJsTaint(root, config) {
@@ -504,7 +504,7 @@ function handleCall(call, tainted, actx) {
       const existing = actx.findings.get(dedupKey);
       const finding = createFinding({
         tool: TOOL.taint,
-        ruleId: `patronus.taint.${category}`,
+        ruleId: `clipeus.taint.${category}`,
         severity: SEVERITY.high,
         category,
         file: actx.fn.file,

@@ -38,7 +38,7 @@ describe('analyzeJsTaint', () => {
   it('marks taint findings as heuristic (medium/low confidence only)', () => {
     for (const f of findings) {
       expect(['medium', 'low']).toContain(f.confidence);
-      expect(f.tool).toBe('patronus-taint');
+      expect(f.tool).toBe('clipeus-taint');
     }
   });
 });

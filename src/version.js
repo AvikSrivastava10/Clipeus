@@ -14,4 +14,4 @@ try {
 }
 
 export const VERSION = version;
-export const PRODUCT = 'Patronus';
+export const PRODUCT = 'Clipeus';

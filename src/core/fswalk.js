@@ -15,7 +15,7 @@ export const DEFAULT_IGNORED_DIRS = new Set([
   'node_modules', '.git', '.hg', '.svn', 'dist', 'build', 'out', 'coverage',
   '.nyc_output', '.venv', 'venv', 'env', '__pycache__', '.next', '.nuxt',
   '.svelte-kit', 'vendor', 'target', 'bin', 'obj', '.gradle', '.idea',
-  '.vscode', '.patronus-cache', '.terraform', '.serverless', '.cache',
+  '.vscode', '.clipeus-cache', '.terraform', '.serverless', '.cache',
   'bower_components', '.pytest_cache', '.mypy_cache', '.tox', 'site-packages',
 ]);
 

@@ -7,10 +7,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Patronus scan output (self-generated reports)
-patronus-report.json
-patronus-report.md
-.patronus-cache/
+# Clipeus scan output (self-generated reports)
+clipeus-report.json
+clipeus-report.md
+.clipeus-cache/
 
 # OWASP Dependency-Check output
 dependency-check-report.*

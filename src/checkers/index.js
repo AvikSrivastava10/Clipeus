@@ -1,5 +1,5 @@
 /**
- * Registry of standalone Patronus checkers (Phase 3).
+ * Registry of standalone Clipeus checkers (Phase 3).
  *
  * Each checker conforms to the internal-analyzer interface:
  *   {

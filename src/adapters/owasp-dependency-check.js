@@ -46,7 +46,7 @@ const adapter = {
       /* handled downstream if missing */
     }
     const reportFile = path.join(outDir, 'dependency-check-report.json');
-    const projectName = path.basename(ctx.root) || 'patronus-scan';
+    const projectName = path.basename(ctx.root) || 'clipeus-scan';
 
     return {
       command: 'dependency-check',

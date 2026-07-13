@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-error-stack-to-client-js
+  - id: clipeus-error-stack-to-client-js
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -7,9 +7,9 @@ rules:
       paths, dependency versions, and internal logic that aid attackers. Log the
       error server-side and return a generic message to the client.
     metadata:
-      patronus-category: info-disclosure
-      patronus-ai-codegen: true
-      patronus-remediation: "Log err server-side; respond with a generic message and a request id."
+      clipeus-category: info-disclosure
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Log err server-side; respond with a generic message and a request id."
       cwe:
         - "CWE-209: Generation of Error Message Containing Sensitive Information"
       confidence: MEDIUM
@@ -20,7 +20,7 @@ rules:
           - pattern: '$RES.json({..., $KEY: $ERR.stack, ...})'
           - pattern: '$RES.status($CODE).json({..., $KEY: $ERR.stack, ...})'
 
-  - id: patronus-traceback-to-client-python
+  - id: clipeus-traceback-to-client-python
     languages: [python]
     severity: WARNING
     message: >-
@@ -28,9 +28,9 @@ rules:
       paths and internal state. Log the traceback server-side and return a
       generic error.
     metadata:
-      patronus-category: info-disclosure
-      patronus-ai-codegen: true
-      patronus-remediation: "Log traceback.format_exc() server-side; return a generic error message."
+      clipeus-category: info-disclosure
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Log traceback.format_exc() server-side; return a generic error message."
       cwe:
         - "CWE-209: Generation of Error Message Containing Sensitive Information"
       confidence: MEDIUM

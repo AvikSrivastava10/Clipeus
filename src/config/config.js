@@ -1,8 +1,8 @@
 /**
  * Configuration loading + defaults.
  *
- * Patronus reads `patronus.config.json` (preferred) or `.patronusrc` /
- * `.patronusrc.json` from the scan root. Missing or malformed config never
+ * Clipeus reads `clipeus.config.json` (preferred) or `.clipeusrc` /
+ * `.clipeusrc.json` from the scan root. Missing or malformed config never
  * crashes the run: we warn and fall back to defaults. User config is deep-merged
  * onto defaults so partial overrides work.
  */
@@ -12,7 +12,7 @@ import path from 'node:path';
 import { DEFAULT_TOOL_TIMEOUT_MS, SEVERITY } from '../constants.js';
 import { log } from '../core/logger.js';
 
-const CONFIG_FILENAMES = ['patronus.config.json', '.patronusrc.json', '.patronusrc'];
+const CONFIG_FILENAMES = ['clipeus.config.json', '.clipeusrc.json', '.clipeusrc'];
 
 /**
  * The canonical default configuration. `init` writes a trimmed, user-friendly
@@ -85,7 +85,7 @@ export function getDefaultConfig() {
       ],
     },
 
-    // Additional suppression patterns merged with .patronusignore entries.
+    // Additional suppression patterns merged with .clipeusignore entries.
     ignore: [],
   };
 }

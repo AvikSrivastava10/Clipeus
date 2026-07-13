@@ -13,7 +13,7 @@ import { chalk } from './logger.js';
 export function isInteractive() {
   // Honor common non-interactive signals so `init` never blocks in CI or
   // scripted contexts. Defaults are used instead of prompting.
-  if (process.env.PATRONUS_NONINTERACTIVE || process.env.CI) return false;
+  if (process.env.CLIPEUS_NONINTERACTIVE || process.env.CI) return false;
   return Boolean(process.stdin.isTTY && process.stderr.isTTY);
 }
 

@@ -65,7 +65,7 @@ export function render(scan, opts = {}) {
   lines.push('');
   const notes = [];
   if (s.aiCodegen > 0) notes.push(`${s.aiCodegen} match AI-codegen antipatterns`);
-  if (scan.suppressedCount > 0) notes.push(`${scan.suppressedCount} suppressed via \`.patronusignore\``);
+  if (scan.suppressedCount > 0) notes.push(`${scan.suppressedCount} suppressed via \`.clipeusignore\``);
   if (scan.duplicatesRemoved > 0) notes.push(`${scan.duplicatesRemoved} duplicates merged`);
   if (notes.length) {
     lines.push(`_${notes.join(' · ')}_`);

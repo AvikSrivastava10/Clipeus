@@ -134,7 +134,7 @@ export function render(scan, opts = {}) {
     out.push(chalk.magenta(`  ${s.aiCodegen} finding${s.aiCodegen === 1 ? '' : 's'} match AI-codegen antipatterns`));
   }
   if (scan.suppressedCount > 0) {
-    out.push(chalk.gray(`  ${scan.suppressedCount} suppressed via .patronusignore`));
+    out.push(chalk.gray(`  ${scan.suppressedCount} suppressed via .clipeusignore`));
   }
   if (scan.duplicatesRemoved > 0) {
     out.push(chalk.gray(`  ${scan.duplicatesRemoved} duplicate finding(s) merged`));

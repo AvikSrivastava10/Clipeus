@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-flask-debug-true
+  - id: clipeus-flask-debug-true
     languages: [python]
     severity: ERROR
     message: >-
@@ -8,9 +8,9 @@ rules:
       source/environment details. Never enable debug in production; gate it
       behind an environment variable.
     metadata:
-      patronus-category: insecure-config
-      patronus-ai-codegen: true
-      patronus-remediation: "app.run(debug=os.environ.get('FLASK_DEBUG') == '1'); default to False."
+      clipeus-category: insecure-config
+      clipeus-ai-codegen: true
+      clipeus-remediation: "app.run(debug=os.environ.get('FLASK_DEBUG') == '1'); default to False."
       cwe:
         - "CWE-489: Active Debug Code"
       confidence: HIGH
@@ -19,7 +19,7 @@ rules:
           - pattern: $APP.run(..., debug=True, ...)
           - pattern: $APP.debug = True
 
-  - id: patronus-django-debug-true
+  - id: clipeus-django-debug-true
     languages: [python]
     severity: WARNING
     message: >-
@@ -27,9 +27,9 @@ rules:
       settings, and SQL to clients. Drive DEBUG from an environment variable and
       default it to False.
     metadata:
-      patronus-category: insecure-config
-      patronus-ai-codegen: true
-      patronus-remediation: "DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'."
+      clipeus-category: insecure-config
+      clipeus-ai-codegen: true
+      clipeus-remediation: "DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'."
       cwe:
         - "CWE-489: Active Debug Code"
       confidence: MEDIUM

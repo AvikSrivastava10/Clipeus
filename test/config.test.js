@@ -6,7 +6,7 @@ import { loadConfig, getDefaultConfig } from '../src/index.js';
 
 let dir;
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'patronus-cfg-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'clipeus-cfg-'));
 });
 afterEach(() => {
   fs.rmSync(dir, { recursive: true, force: true });
@@ -23,7 +23,7 @@ describe('loadConfig', () => {
 
   it('deep-merges user config over defaults', () => {
     fs.writeFileSync(
-      path.join(dir, 'patronus.config.json'),
+      path.join(dir, 'clipeus.config.json'),
       JSON.stringify({ failOn: 'high', tools: { disabled: ['trivy'] } }),
     );
     const { config } = loadConfig(dir);
@@ -36,7 +36,7 @@ describe('loadConfig', () => {
 
   it('ignores an invalid failOn value but keeps other keys', () => {
     fs.writeFileSync(
-      path.join(dir, 'patronus.config.json'),
+      path.join(dir, 'clipeus.config.json'),
       JSON.stringify({ failOn: 'banana', toolTimeoutMs: 5000 }),
     );
     const { config } = loadConfig(dir);
@@ -45,7 +45,7 @@ describe('loadConfig', () => {
   });
 
   it('falls back to defaults on malformed JSON without throwing', () => {
-    fs.writeFileSync(path.join(dir, 'patronus.config.json'), '{ not valid json ');
+    fs.writeFileSync(path.join(dir, 'clipeus.config.json'), '{ not valid json ');
     const { config } = loadConfig(dir);
     expect(config.failOn).toBe('critical');
   });

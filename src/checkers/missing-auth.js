@@ -7,7 +7,7 @@
  *
  * This is a heuristic — findings are medium confidence. The "sensitive path"
  * keyword list and recognized auth guard names are configurable via
- * patronus.config.json so teams can tune it to their own naming.
+ * clipeus.config.json so teams can tune it to their own naming.
  */
 
 import { TOOL, SEVERITY, CONFIDENCE, CATEGORY } from '../constants.js';
@@ -71,7 +71,7 @@ const checker = {
       findings.push(
         createFinding({
           tool: TOOL.authChecker,
-          ruleId: 'patronus.missing-auth',
+          ruleId: 'clipeus.missing-auth',
           severity: SEVERITY.high,
           category: CATEGORY.missingAuth,
           file: route.file,
@@ -80,7 +80,7 @@ const checker = {
           confidence: CONFIDENCE.medium,
           aiCodegenRelevant: true,
           remediation:
-            'Attach an auth middleware/decorator (e.g. requireAuth, @login_required) to this route, or apply one globally. If this route is intentionally public, add it to .patronusignore or tune checkers.sensitivePathKeywords.',
+            'Attach an auth middleware/decorator (e.g. requireAuth, @login_required) to this route, or apply one globally. If this route is intentionally public, add it to .clipeusignore or tune checkers.sensitivePathKeywords.',
           references: ['https://owasp.org/Top10/A01_2021-Broken_Access_Control/'],
         }),
       );

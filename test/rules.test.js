@@ -58,7 +58,7 @@ describe('custom Semgrep rules', () => {
     }
   });
 
-  it('every rule has valid id, message, severity, languages, pattern, and patronus-category', () => {
+  it('every rule has valid id, message, severity, languages, pattern, and clipeus-category', () => {
     for (const file of files) {
       for (const rule of loadRules(file)) {
         const where = `${file}#${rule.id}`;
@@ -70,8 +70,8 @@ describe('custom Semgrep rules', () => {
         expect(Array.isArray(rule.languages) && rule.languages.length > 0, `${where} languages`).toBe(true);
         expect(hasPatternClause(rule), `${where} has a pattern clause`).toBe(true);
 
-        const category = rule.metadata?.['patronus-category'];
-        expect(CATEGORY_VALUES.includes(category), `${where} patronus-category "${category}" in taxonomy`).toBe(true);
+        const category = rule.metadata?.['clipeus-category'];
+        expect(CATEGORY_VALUES.includes(category), `${where} clipeus-category "${category}" in taxonomy`).toBe(true);
       }
     }
   });
@@ -90,7 +90,7 @@ describe('custom Semgrep rules', () => {
     let aiCount = 0;
     for (const file of files) {
       for (const rule of loadRules(file)) {
-        if (rule.metadata?.['patronus-ai-codegen'] === true) aiCount += 1;
+        if (rule.metadata?.['clipeus-ai-codegen'] === true) aiCount += 1;
       }
     }
     expect(aiCount).toBeGreaterThan(5);

@@ -7,7 +7,7 @@ import { enableHook, disableHook, hookStatus } from '../src/hooks/git-hook.js';
 let dir;
 let hookPath;
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'patronus-hook-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'clipeus-hook-'));
   fs.mkdirSync(path.join(dir, '.git', 'hooks'), { recursive: true });
   hookPath = path.join(dir, '.git', 'hooks', 'pre-push');
 });
@@ -16,12 +16,12 @@ afterEach(() => {
 });
 
 describe('enableHook / disableHook', () => {
-  it('creates a hook that runs patronus scan with the threshold', () => {
+  it('creates a hook that runs clipeus scan with the threshold', () => {
     const res = enableHook(dir, { threshold: 'high' });
     expect(res.action).toBe('created');
     const content = fs.readFileSync(hookPath, 'utf8');
     expect(content).toMatch(/#!\/bin\/sh/);
-    expect(content).toMatch(/patronus scan --fail-on=high/);
+    expect(content).toMatch(/clipeus scan --fail-on=high/);
     expect(hookStatus(dir).enabled).toBe(true);
   });
 
@@ -33,7 +33,7 @@ describe('enableHook / disableHook', () => {
     expect(content).toMatch(/--fail-on=medium/);
     expect(content).not.toMatch(/--fail-on=critical/);
     // Only one managed block.
-    expect(content.match(/patronus \(managed\)/g)).toHaveLength(2); // BEGIN + END markers
+    expect(content.match(/clipeus \(managed\)/g)).toHaveLength(2); // BEGIN + END markers
   });
 
   it('preserves pre-existing hook content when appending', () => {
@@ -42,7 +42,7 @@ describe('enableHook / disableHook', () => {
     expect(res.action).toBe('appended');
     const content = fs.readFileSync(hookPath, 'utf8');
     expect(content).toMatch(/echo "existing hook"/);
-    expect(content).toMatch(/patronus scan --fail-on=high/);
+    expect(content).toMatch(/clipeus scan --fail-on=high/);
   });
 
   it('disable removes only our block and keeps other content', () => {
@@ -52,7 +52,7 @@ describe('enableHook / disableHook', () => {
     expect(res.action).toBe('removed');
     const content = fs.readFileSync(hookPath, 'utf8');
     expect(content).toMatch(/echo "existing hook"/);
-    expect(content).not.toMatch(/patronus \(managed\)/);
+    expect(content).not.toMatch(/clipeus \(managed\)/);
   });
 
   it('disable deletes the file when it contained only our block', () => {

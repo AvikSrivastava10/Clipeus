@@ -24,7 +24,7 @@ import { ALL_CHECKERS } from '../checkers/index.js';
 import { TAINT_ANALYZERS } from '../taint/index.js';
 import { detectProject } from '../detectors/detect.js';
 import { loadConfig } from '../config/config.js';
-import { loadSuppressions } from '../config/patronusignore.js';
+import { loadSuppressions } from '../config/clipeusignore.js';
 import { deduplicate, sortFindings, summarize } from '../core/dedup.js';
 import { meetsSeverityThreshold } from '../core/finding.js';
 import { log } from '../core/logger.js';
@@ -159,9 +159,9 @@ export async function runScan(options = {}) {
   // Read-only guarantee: intermediate tool output lives in an OS temp dir.
   let tmpDir;
   try {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'patronus-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clipeus-'));
   } catch {
-    tmpDir = path.join(os.tmpdir(), `patronus-${Date.now()}`);
+    tmpDir = path.join(os.tmpdir(), `clipeus-${Date.now()}`);
     try { fs.mkdirSync(tmpDir, { recursive: true }); } catch { /* best effort */ }
   }
 

@@ -1,7 +1,7 @@
 /**
  * Git pre-push hook management.
  *
- * `enable` installs a pre-push hook that runs `patronus scan --fail-on=<threshold>`
+ * `enable` installs a pre-push hook that runs `clipeus scan --fail-on=<threshold>`
  * and blocks the push on a non-zero exit. `disable` removes it cleanly.
  *
  * Existing hook content is always preserved: our lines live between managed
@@ -12,8 +12,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const BEGIN = '# >>> patronus (managed) >>>';
-const END = '# <<< patronus (managed) <<<';
+const BEGIN = '# >>> clipeus (managed) >>>';
+const END = '# <<< clipeus (managed) <<<';
 
 function escapeRegex(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -47,9 +47,9 @@ export function resolveHookTarget(root) {
 function buildBlock(threshold) {
   return [
     BEGIN,
-    '# Added by `patronus hook enable`. Remove with `patronus hook disable`.',
-    `npx patronus scan --fail-on=${threshold} || {`,
-    `  echo "patronus: push blocked by findings at or above ${threshold} severity." >&2`,
+    '# Added by `clipeus hook enable`. Remove with `clipeus hook disable`.',
+    `npx clipeus scan --fail-on=${threshold} || {`,
+    `  echo "clipeus: push blocked by findings at or above ${threshold} severity." >&2`,
     '  exit 1',
     '}',
     END,

@@ -3,7 +3,7 @@
  *
  * Invokes the free CLI in JSON mode only. Never touches Semgrep Cloud/Team
  * features, never logs in, never uses --autofix. Loads Semgrep's `auto` config
- * plus Patronus's bundled custom rules directory (Phase 2) when present.
+ * plus Clipeus's bundled custom rules directory (Phase 2) when present.
  */
 
 import fs from 'node:fs';
@@ -85,9 +85,9 @@ const adapter = {
       const extra = r.extra || {};
       const meta = extra.metadata || {};
 
-      // Category: prefer explicit Patronus tag, then a taxonomy-valid metadata
+      // Category: prefer explicit Clipeus tag, then a taxonomy-valid metadata
       // category, else infer from rule id + message.
-      let category = meta['patronus-category'] || meta.patronus_category;
+      let category = meta['clipeus-category'] || meta.clipeus_category;
       if (!category || !CATEGORY_VALUES.includes(category)) {
         category = CATEGORY_VALUES.includes(meta.category) ? meta.category : null;
       }
@@ -95,7 +95,7 @@ const adapter = {
         category = inferCategory(`${r.check_id} ${extra.message || ''}`, CATEGORY.other);
       }
 
-      const aiTag = meta['patronus-ai-codegen'] ?? meta.patronus_ai_codegen;
+      const aiTag = meta['clipeus-ai-codegen'] ?? meta.clipeus_ai_codegen;
       const aiCodegenRelevant =
         aiTag === true ||
         aiTag === 'true' ||
@@ -107,7 +107,7 @@ const adapter = {
         .concat(Array.isArray(meta.cwe) ? meta.cwe : [])
         .map(String);
 
-      const explicitSeverity = meta['patronus-severity'];
+      const explicitSeverity = meta['clipeus-severity'];
 
       return createFinding({
         tool: TOOL.semgrep,
@@ -124,7 +124,7 @@ const adapter = {
         confidence: mapConfidence(meta.confidence),
         aiCodegenRelevant,
         references: references.length ? references : undefined,
-        remediation: meta['patronus-remediation'] || (extra.fix ? `Suggested fix: ${extra.fix}` : undefined),
+        remediation: meta['clipeus-remediation'] || (extra.fix ? `Suggested fix: ${extra.fix}` : undefined),
         toolVersion: version,
         raw: ctx?.verbose ? r : undefined,
       });

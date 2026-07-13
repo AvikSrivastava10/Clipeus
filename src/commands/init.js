@@ -1,5 +1,5 @@
 /**
- * `patronus init` command.
+ * `clipeus init` command.
  *
  * First-run setup:
  *   1. Detect the project's stack.
@@ -7,9 +7,9 @@
  *      ones via their own package manager (interactive only — never installs
  *      software without explicit confirmation).
  *   3. Offer to install the pre-push scan hook.
- *   4. Write a default patronus.config.json.
+ *   4. Write a default clipeus.config.json.
  *
- * Read-only w.r.t. source code: the only files this may write are Patronus's
+ * Read-only w.r.t. source code: the only files this may write are Clipeus's
  * own config and (with consent) the git hook.
  */
 
@@ -26,7 +26,7 @@ import { log, spinner, chalk } from '../core/logger.js';
 import { SEVERITY } from '../constants.js';
 import { PRODUCT } from '../version.js';
 
-const CONFIG_FILE = 'patronus.config.json';
+const CONFIG_FILE = 'clipeus.config.json';
 
 function curatedConfig() {
   return {
@@ -88,7 +88,7 @@ export async function initCommand(opts = {}) {
 
   const requiredToolIds = [...detection.enabledTools];
   if (requiredToolIds.length === 0) {
-    log.warn('No recognizable project markers found. You can still run `patronus scan`.');
+    log.warn('No recognizable project markers found. You can still run `clipeus scan`.');
   } else {
     log.step(`Relevant tools: ${requiredToolIds.join(', ')}`);
   }
@@ -154,7 +154,7 @@ export async function initCommand(opts = {}) {
         log.error(`Could not install hook: ${err.message}`);
       }
     } else {
-      log.info(chalk.gray('   skipped. Enable later with `patronus hook enable`.'));
+      log.info(chalk.gray('   skipped. Enable later with `clipeus hook enable`.'));
     }
   } else {
     log.info(chalk.gray('No .git directory found; skipping pre-push hook setup.'));
@@ -180,6 +180,6 @@ export async function initCommand(opts = {}) {
   }
 
   log.blank();
-  log.raw(chalk.green.bold('✔ Setup complete.') + chalk.gray('  Run `patronus scan` to audit your project.'));
+  log.raw(chalk.green.bold('✔ Setup complete.') + chalk.gray('  Run `clipeus scan` to audit your project.'));
   log.blank();
 }

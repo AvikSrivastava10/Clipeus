@@ -1,5 +1,5 @@
 rules:
-  - id: patronus-webhook-missing-signature-verification
+  - id: clipeus-webhook-missing-signature-verification
     languages: [javascript, typescript]
     severity: WARNING
     message: >-
@@ -9,9 +9,9 @@ rules:
       the provider signature (e.g. Stripe-Signature, X-Hub-Signature-256) using
       a timing-safe comparison before trusting the body.
     metadata:
-      patronus-category: missing-auth
-      patronus-ai-codegen: true
-      patronus-remediation: "Compute an HMAC over the raw body with the shared secret and compare it (timingSafeEqual) to the provider signature header before processing."
+      clipeus-category: missing-auth
+      clipeus-ai-codegen: true
+      clipeus-remediation: "Compute an HMAC over the raw body with the shared secret and compare it (timingSafeEqual) to the provider signature header before processing."
       cwe:
         - "CWE-345: Insufficient Verification of Data Authenticity"
       confidence: LOW

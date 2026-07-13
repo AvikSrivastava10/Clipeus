@@ -3,7 +3,7 @@
  *
  * Scans the target directory (top level plus reasonably nested locations) for
  * marker files and maps them to the set of tools/checkers that make sense for
- * the stack. This keeps Patronus project-aware: we never run a Python scanner
+ * the stack. This keeps Clipeus project-aware: we never run a Python scanner
  * on a pure JS project, etc.
  *
  * The result is stored in the scan context so later phases (custom rules, route
@@ -195,7 +195,7 @@ export function computeEnabledTools(stacks, hasSourceFiles) {
   return tools;
 }
 
-/** Which internal Patronus checkers/engines apply, based on languages. */
+/** Which internal Clipeus checkers/engines apply, based on languages. */
 export function computeEnabledCheckers(detection) {
   const checkers = new Set();
   if (detection.languages.includes('javascript') || detection.languages.includes('python')) {
