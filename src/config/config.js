@@ -66,6 +66,7 @@ export function getDefaultConfig() {
     taint: {
       sources: [
         'req.body', 'req.query', 'req.params', 'req.headers', 'req.cookies',
+        'request.body', 'request.query', 'request.params',
         'request.form', 'request.args', 'request.values', 'request.json',
         'request.data', 'request.GET', 'request.POST', 'process.argv',
       ],
