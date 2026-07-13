@@ -1,0 +1,66 @@
+rules:
+  - id: patronus-tls-reject-unauthorized-false
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      TLS certificate validation is disabled (rejectUnauthorized:false). This
+      makes HTTPS connections vulnerable to man-in-the-middle attacks. Remove
+      this option or provide a proper CA instead.
+    metadata:
+      patronus-category: insecure-transport
+      patronus-ai-codegen: true
+      patronus-remediation: "Remove rejectUnauthorized:false; supply a trusted CA via the `ca` option if needed."
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      confidence: HIGH
+    patterns:
+      - pattern: '{..., rejectUnauthorized: false, ...}'
+
+  - id: patronus-node-tls-reject-env
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      NODE_TLS_REJECT_UNAUTHORIZED is set to "0", globally disabling TLS
+      certificate validation for the entire process. Never do this in
+      production.
+    metadata:
+      patronus-category: insecure-transport
+      patronus-ai-codegen: true
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      confidence: HIGH
+    patterns:
+      - pattern: 'process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"'
+
+  - id: patronus-requests-verify-false
+    languages: [python]
+    severity: ERROR
+    message: >-
+      An HTTP request is made with verify=False, disabling TLS certificate
+      validation and enabling man-in-the-middle attacks. Remove verify=False or
+      point it at a proper CA bundle.
+    metadata:
+      patronus-category: insecure-transport
+      patronus-ai-codegen: true
+      patronus-remediation: "Remove verify=False; use verify=True or verify='/path/to/ca-bundle.crt'."
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      confidence: HIGH
+    patterns:
+      - pattern: requests.$METHOD(..., verify=False, ...)
+
+  - id: patronus-ssl-unverified-context
+    languages: [python]
+    severity: ERROR
+    message: >-
+      An unverified SSL context is created (ssl._create_unverified_context),
+      disabling certificate validation. Use ssl.create_default_context()
+      instead.
+    metadata:
+      patronus-category: insecure-transport
+      patronus-ai-codegen: true
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      confidence: HIGH
+    patterns:
+      - pattern: ssl._create_unverified_context(...)

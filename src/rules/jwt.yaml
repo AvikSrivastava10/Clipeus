@@ -1,0 +1,91 @@
+rules:
+  - id: patronus-jwt-algorithm-none
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      JWT is verified/signed with the "none" algorithm, which disables
+      signature verification entirely. An attacker can forge tokens with
+      arbitrary claims. Always pin a strong algorithm (e.g. HS256/RS256).
+    metadata:
+      patronus-category: insecure-jwt
+      patronus-ai-codegen: true
+      patronus-remediation: 'Specify a real algorithm, e.g. jwt.verify(token, key, { algorithms: ["RS256"] }).'
+      cwe:
+        - "CWE-347: Improper Verification of Cryptographic Signature"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: 'jwt.verify(..., {..., algorithms: ["none"], ...})'
+          - pattern: 'jwt.verify(..., {..., algorithms: ["None"], ...})'
+          - pattern: 'jwt.sign(..., {..., algorithm: "none", ...})'
+
+  - id: patronus-jwt-hardcoded-secret
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: >-
+      JWT signing/verification uses a hardcoded string secret. Anyone with
+      access to the source can forge or read tokens. Load the secret from an
+      environment variable or secrets manager.
+    metadata:
+      patronus-category: insecure-jwt
+      patronus-ai-codegen: true
+      patronus-remediation: 'Use process.env.JWT_SECRET (validated at startup) instead of a literal.'
+      cwe:
+        - "CWE-798: Use of Hard-coded Credentials"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: 'jwt.sign($PAYLOAD, "...", ...)'
+          - pattern: 'jwt.verify($TOKEN, "...", ...)'
+
+  - id: patronus-jwt-missing-expiration
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      JWT is signed without an expiration (no expiresIn / exp claim). Tokens
+      that never expire cannot be revoked by time and remain valid forever if
+      leaked. Set a short expiresIn.
+    metadata:
+      patronus-category: insecure-jwt
+      patronus-ai-codegen: true
+      patronus-remediation: "jwt.sign(payload, secret, { expiresIn: '15m' })."
+      cwe:
+        - "CWE-613: Insufficient Session Expiration"
+      confidence: MEDIUM
+    patterns:
+      - pattern: jwt.sign($PAYLOAD, $SECRET)
+      - pattern-not: 'jwt.sign($PAYLOAD, "...")'
+
+  - id: patronus-jwt-verify-disabled-python
+    languages: [python]
+    severity: ERROR
+    message: >-
+      PyJWT decode is called with signature verification disabled
+      (verify=False or options={"verify_signature": False}). This accepts
+      forged tokens. Always verify the signature and pass algorithms.
+    metadata:
+      patronus-category: insecure-jwt
+      patronus-ai-codegen: true
+      patronus-remediation: 'jwt.decode(token, key, algorithms=["RS256"]).'
+      cwe:
+        - "CWE-347: Improper Verification of Cryptographic Signature"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: jwt.decode(..., verify=False, ...)
+          - pattern: 'jwt.decode(..., options={..., "verify_signature": False, ...}, ...)'
+
+  - id: patronus-jwt-algorithm-none-python
+    languages: [python]
+    severity: ERROR
+    message: >-
+      PyJWT decode accepts the "none" algorithm, disabling signature
+      verification. Pin explicit strong algorithms.
+    metadata:
+      patronus-category: insecure-jwt
+      patronus-ai-codegen: true
+      cwe:
+        - "CWE-347: Improper Verification of Cryptographic Signature"
+      confidence: HIGH
+    patterns:
+      - pattern: 'jwt.decode(..., algorithms=["none"], ...)'

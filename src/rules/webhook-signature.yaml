@@ -1,0 +1,27 @@
+rules:
+  - id: patronus-webhook-missing-signature-verification
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      A webhook-looking route handler does not appear to verify a request
+      signature (no HMAC/signature check found in the handler). Unverified
+      webhooks let anyone forge events (fake payments, fake CI results). Verify
+      the provider signature (e.g. Stripe-Signature, X-Hub-Signature-256) using
+      a timing-safe comparison before trusting the body.
+    metadata:
+      patronus-category: missing-auth
+      patronus-ai-codegen: true
+      patronus-remediation: "Compute an HMAC over the raw body with the shared secret and compare it (timingSafeEqual) to the provider signature header before processing."
+      cwe:
+        - "CWE-345: Insufficient Verification of Data Authenticity"
+      confidence: LOW
+    patterns:
+      - pattern-either:
+          - pattern: $APP.post($PATH, function ($REQ, $RES) { ... })
+          - pattern: $APP.post($PATH, async function ($REQ, $RES) { ... })
+          - pattern: $APP.post($PATH, ($REQ, $RES) => { ... })
+          - pattern: $APP.post($PATH, async ($REQ, $RES) => { ... })
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: (?i)(webhook|/hook|stripe|github|payment|callback)
+      - pattern-not-regex: (?i)(signature|verif|hmac|createhmac|x-hub|stripe-signature|timingsafeequal|constant_?time)

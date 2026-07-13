@@ -1,0 +1,52 @@
+rules:
+  - id: patronus-cors-wildcard-origin
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      CORS is configured to allow any origin ("*" or a reflected `true`). This
+      lets any website make cross-origin requests to your API; combined with
+      credentials it can expose authenticated data. Restrict allowed origins to
+      an explicit allowlist.
+    metadata:
+      patronus-category: cors-misconfig
+      patronus-ai-codegen: true
+      patronus-remediation: >-
+        Replace the wildcard with an explicit list of trusted origins, e.g.
+        cors({ origin: ["https://app.example.com"] }).
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      references:
+        - https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: $RES.header("Access-Control-Allow-Origin", "*")
+          - pattern: $RES.set("Access-Control-Allow-Origin", "*")
+          - pattern: $RES.setHeader("Access-Control-Allow-Origin", "*")
+          - pattern: 'cors({..., origin: "*", ...})'
+          - pattern: 'cors({..., origin: true, ...})'
+
+  - id: patronus-cors-wildcard-origin-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      CORS is configured to allow any origin. flask-cors defaults to "*" when
+      no origins are specified, allowing any website to call your API. Restrict
+      allowed origins to an explicit allowlist.
+    metadata:
+      patronus-category: cors-misconfig
+      patronus-ai-codegen: true
+      patronus-remediation: >-
+        Pass an explicit origins list, e.g. CORS(app, origins=["https://app.example.com"]).
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      confidence: MEDIUM
+    patterns:
+      - pattern-either:
+          - pattern: CORS($APP, origins="*")
+          - pattern: CORS($APP)
+          - pattern: $RESP.headers["Access-Control-Allow-Origin"] = "*"

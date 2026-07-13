@@ -1,0 +1,37 @@
+rules:
+  - id: patronus-flask-debug-true
+    languages: [python]
+    severity: ERROR
+    message: >-
+      Flask is running with debug mode enabled. The Werkzeug debugger allows
+      arbitrary code execution via the interactive traceback console and leaks
+      source/environment details. Never enable debug in production; gate it
+      behind an environment variable.
+    metadata:
+      patronus-category: insecure-config
+      patronus-ai-codegen: true
+      patronus-remediation: "app.run(debug=os.environ.get('FLASK_DEBUG') == '1'); default to False."
+      cwe:
+        - "CWE-489: Active Debug Code"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: $APP.run(..., debug=True, ...)
+          - pattern: $APP.debug = True
+
+  - id: patronus-django-debug-true
+    languages: [python]
+    severity: WARNING
+    message: >-
+      DEBUG is hardcoded to True. In production this exposes stack traces,
+      settings, and SQL to clients. Drive DEBUG from an environment variable and
+      default it to False.
+    metadata:
+      patronus-category: insecure-config
+      patronus-ai-codegen: true
+      patronus-remediation: "DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'."
+      cwe:
+        - "CWE-489: Active Debug Code"
+      confidence: MEDIUM
+    patterns:
+      - pattern: DEBUG = True

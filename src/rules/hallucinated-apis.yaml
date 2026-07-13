@@ -1,0 +1,43 @@
+rules:
+  # Best-effort: flags calls to security-sounding methods that do NOT exist in
+  # the referenced library's public API. These are commonly invented by AI code
+  # generators. Confidence is intentionally lower.
+  - id: patronus-hallucinated-security-api-js
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      Call to a security method that does not exist in the library's public API
+      (a common AI-codegen hallucination). Verify the real API, e.g.
+      bcrypt.compare(), jwt.verify(), crypto.createCipheriv().
+    metadata:
+      patronus-category: other
+      patronus-ai-codegen: true
+      patronus-remediation: "Replace with the library's actual method (bcrypt.compare, jwt.verify, crypto.createCipheriv, etc.)."
+      confidence: LOW
+    patterns:
+      - pattern-either:
+          - pattern: jwt.validate(...)
+          - pattern: bcrypt.verify(...)
+          - pattern: bcrypt.encrypt(...)
+          - pattern: bcrypt.decrypt(...)
+          - pattern: crypto.encrypt(...)
+          - pattern: crypto.decrypt(...)
+
+  - id: patronus-hallucinated-security-api-python
+    languages: [python]
+    severity: WARNING
+    message: >-
+      Call to a security method that does not exist in the library's public API
+      (a common AI-codegen hallucination). Verify the real API, e.g.
+      bcrypt.checkpw(), jwt.decode().
+    metadata:
+      patronus-category: other
+      patronus-ai-codegen: true
+      patronus-remediation: "Use the library's actual method (bcrypt.checkpw, jwt.decode, hashlib.new, etc.)."
+      confidence: LOW
+    patterns:
+      - pattern-either:
+          - pattern: jwt.validate(...)
+          - pattern: bcrypt.verify(...)
+          - pattern: bcrypt.encrypt(...)
+          - pattern: hashlib.encrypt(...)

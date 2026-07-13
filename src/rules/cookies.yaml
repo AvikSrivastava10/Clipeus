@@ -1,0 +1,58 @@
+rules:
+  - id: patronus-insecure-cookie-httponly-false
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      A cookie is set with httpOnly:false, making it readable by client-side
+      JavaScript. Session/auth cookies should be HttpOnly so XSS cannot steal
+      them.
+    metadata:
+      patronus-category: insecure-cookie-flags
+      patronus-ai-codegen: true
+      patronus-remediation: "Set httpOnly: true on session/auth cookies."
+      cwe:
+        - "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: '$RES.cookie($NAME, $VAL, {..., httpOnly: false, ...})'
+          - pattern: 'session({..., cookie: {..., httpOnly: false, ...}, ...})'
+
+  - id: patronus-insecure-cookie-secure-false
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: >-
+      A cookie is set with secure:false, so it can be transmitted over plain
+      HTTP and intercepted. Session/auth cookies should set Secure so they are
+      only sent over HTTPS.
+    metadata:
+      patronus-category: insecure-cookie-flags
+      patronus-ai-codegen: true
+      patronus-remediation: "Set secure: true (and serve over HTTPS)."
+      cwe:
+        - "CWE-614: Sensitive Cookie Without 'Secure' Attribute"
+      confidence: MEDIUM
+    patterns:
+      - pattern-either:
+          - pattern: '$RES.cookie($NAME, $VAL, {..., secure: false, ...})'
+          - pattern: 'session({..., cookie: {..., secure: false, ...}, ...})'
+
+  - id: patronus-insecure-cookie-flask
+    languages: [python]
+    severity: WARNING
+    message: >-
+      A Flask session/response cookie disables HttpOnly or Secure. This exposes
+      the cookie to client-side scripts or plain-HTTP interception.
+    metadata:
+      patronus-category: insecure-cookie-flags
+      patronus-ai-codegen: true
+      patronus-remediation: "Set SESSION_COOKIE_HTTPONLY=True and SESSION_COOKIE_SECURE=True."
+      cwe:
+        - "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"
+      confidence: HIGH
+    patterns:
+      - pattern-either:
+          - pattern: $RESP.set_cookie(..., httponly=False, ...)
+          - pattern: $RESP.set_cookie(..., secure=False, ...)
+          - pattern: "$APP.config['SESSION_COOKIE_HTTPONLY'] = False"
+          - pattern: "$APP.config['SESSION_COOKIE_SECURE'] = False"
