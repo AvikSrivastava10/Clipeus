@@ -43,12 +43,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AvikSrivastava10/Patronus.git"
+    "url": "git+https://github.com/AvikSrivastava10/Clipeus.git"
   },
   "bugs": {
-    "url": "https://github.com/AvikSrivastava10/Patronus/issues"
+    "url": "https://github.com/AvikSrivastava10/Clipeus/issues"
   },
-  "homepage": "https://github.com/AvikSrivastava10/Patronus#readme",
+  "homepage": "https://github.com/AvikSrivastava10/Clipeus#readme",
   "dependencies": {
     "@babel/parser": "^7.29.7",
     "@babel/traverse": "^7.29.7",
