@@ -133,17 +133,32 @@ export function redactSecret(value) {
   return `${s.slice(0, 3)}…[redacted, ${s.length} chars]`;
 }
 
-/** Format install instructions into a single-line hint. */
-export function installHint(adapter) {
+/**
+ * Format install instructions into a single-line hint, ordered for the current
+ * OS. Homebrew is only suggested off Windows, so Windows users don't get a
+ * `brew install ...` hint they can't use; the upstream URL is always offered as
+ * a fallback. `platform` is injectable for testing (defaults to process.platform).
+ */
+export function installHint(adapter, platform = process.platform) {
   const i = adapter.install || {};
-  if (i.recommended) return i.recommended;
   const parts = [];
+  // Cross-platform package managers first.
   if (i.pip) parts.push(i.pip);
-  if (i.brew) parts.push(i.brew);
   if (i.npm) parts.push(i.npm);
   if (i.go) parts.push(i.go);
-  if (i.url) parts.push(`see ${i.url}`);
-  return parts.length ? parts.join('  |  ') : `install ${adapter.command}`;
+  // Homebrew is macOS/Linux only — never suggest it on Windows.
+  if (i.brew && platform !== 'win32') parts.push(i.brew);
+
+  if (parts.length) {
+    if (i.url) parts.push(`see ${i.url}`);
+    return parts.join('  |  ');
+  }
+  // No OS-appropriate package-manager hint. Prefer the URL on Windows (the
+  // `recommended` string is macOS-centric); fall back to it elsewhere too.
+  if (platform === 'win32') {
+    return i.url ? `see ${i.url}` : `install ${adapter.command}`;
+  }
+  return i.recommended || (i.url ? `see ${i.url}` : `install ${adapter.command}`);
 }
 
 function readOutput(invocation, runResult) {
