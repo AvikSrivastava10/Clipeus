@@ -1,6 +1,6 @@
 {
   "name": "clipeus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Free, open-source on-demand security and vulnerability auditing CLI. Orchestrates OSS scanners and adds custom detection for gaps common in AI-assisted (\"vibe coded\") development. Read-only, never modifies your code.",
   "type": "module",
   "bin": {
