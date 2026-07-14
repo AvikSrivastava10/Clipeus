@@ -2,8 +2,16 @@
  * Semgrep adapter (Semgrep CE / OSS, LGPL-2.1).
  *
  * Invokes the free CLI in JSON mode only. Never touches Semgrep Cloud/Team
- * features, never logs in, never uses --autofix. Loads Semgrep's `auto` config
- * plus Clipeus's bundled custom rules directory (Phase 2) when present.
+ * features, never logs in, never uses --autofix. When online it runs a curated
+ * registry ruleset (p/default) alongside Clipeus's bundled custom rules; when
+ * offline it uses the bundled rules only. Telemetry is always disabled
+ * (--metrics=off).
+ *
+ * Note: Semgrep's `auto` config is deliberately NOT used. `auto` uploads
+ * project metadata to the registry to tailor a ruleset and therefore REQUIRES
+ * metrics to be enabled — under --metrics=off it aborts with "Cannot create
+ * auto config when metrics are off". Named registry packs have no such
+ * requirement and run fine with metrics disabled.
  */
 
 import fs from 'node:fs';
@@ -46,17 +54,26 @@ const adapter = {
     const configs = [];
     const userConfigs = ctx.config?.semgrep?.configs;
     if (Array.isArray(userConfigs) && userConfigs.length) {
+      // Explicit user configs win — run exactly what they asked for.
       configs.push(...userConfigs);
     } else if (!ctx.offline) {
-      // `auto` fetches a tailored ruleset from the Semgrep registry (network).
-      // In offline mode we skip it and rely solely on the bundled rules.
-      configs.push('auto');
+      // Online default: a curated registry ruleset for broad coverage. We do
+      // NOT use `auto` — it requires metrics to be ON (it uploads project
+      // metadata to tailor rules) and so is incompatible with --metrics=off.
+      // A named registry pack works fine with metrics disabled. Override it via
+      // config.semgrep.registry, or set that to false to skip the registry.
+      const registry = ctx.config?.semgrep?.registry;
+      if (registry !== false && registry !== null) {
+        const pack = typeof registry === 'string' && registry.trim() ? registry.trim() : 'p/default';
+        configs.push(pack);
+      }
     }
     // Bundled custom rules (Phase 2) — always available, no network.
     if (ctx.rulesDir && fs.existsSync(ctx.rulesDir)) {
       configs.push(ctx.rulesDir);
     }
-    // If offline and there were no configs at all, still point at bundled rules.
+    // Always ensure at least the bundled rules run (e.g. offline, or the
+    // registry disabled with no user configs).
     if (configs.length === 0 && ctx.rulesDir) {
       configs.push(ctx.rulesDir);
     }
