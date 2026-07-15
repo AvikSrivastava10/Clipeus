@@ -12,6 +12,7 @@ import { commandExists, getToolVersion, runTool } from '../core/runner.js';
 import { installHint } from '../adapters/base.js';
 import { detectProject } from '../detectors/detect.js';
 import { resolveToolInEnvironments } from '../detectors/environments.js';
+import { getDownloadedBinary } from '../core/binary-download.js';
 import { selectAnalyzers } from '../scan/engine.js';
 import { loadConfig } from '../config/config.js';
 import { log, chalk } from '../core/logger.js';
@@ -65,13 +66,15 @@ export async function doctorCommand(opts = {}) {
     }
 
     // Honor the project's virtualenv(s) for Python tools before a PATH lookup.
+    // Also check ~/.clipeus/bin/ for auto-downloaded binaries.
+    const downloaded = getDownloadedBinary(adapter.id);
     const viaVenv = resolveToolInEnvironments(detection.pythonEnvs || [], adapter.command);
-    const resolvedCmd = viaVenv ? viaVenv.command : adapter.command;
-    const exists = viaVenv ? true : await commandExists(adapter.command);
+    const resolvedCmd = downloaded || (viaVenv ? viaVenv.command : adapter.command);
+    const exists = downloaded || viaVenv ? true : await commandExists(adapter.command);
     if (exists) {
       const version = await getToolVersion(resolvedCmd, adapter.versionArgs);
-      const where = viaVenv ? chalk.gray(`  [${viaVenv.env.source}]`) : '';
-      out.push(`  ${chalk.green('✓')} ${adapter.id.padEnd(22)} ${chalk.gray(version || 'installed')}${where}`);
+      const marker = downloaded ? chalk.gray('  [downloaded]') : viaVenv ? chalk.gray(`  [${viaVenv.env.source}]`) : '';
+      out.push(`  ${chalk.green('✓')} ${adapter.id.padEnd(22)} ${chalk.gray(version || 'installed')}${marker}`);
     } else {
       missing += 1;
       out.push(

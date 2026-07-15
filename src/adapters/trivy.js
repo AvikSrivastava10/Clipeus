@@ -10,6 +10,8 @@
 import { TOOL, CONFIDENCE, CATEGORY } from '../constants.js';
 import { createFinding } from '../core/finding.js';
 import { normalizeSeverity, redactSecret } from './base.js';
+import { commandExists } from '../core/runner.js';
+import { getDownloadedBinary } from '../core/binary-download.js';
 
 const adapter = {
   id: TOOL.trivy,
@@ -22,6 +24,13 @@ const adapter = {
     brew: 'brew install trivy',
     recommended: 'brew install trivy  (or download a release binary)',
     url: 'https://trivy.dev/latest/getting-started/installation/',
+  },
+
+  async locate() {
+    const downloaded = getDownloadedBinary('trivy');
+    if (downloaded) return { command: downloaded };
+    if (await commandExists('trivy')) return { command: 'trivy' };
+    return null;
   },
 
   buildInvocation(ctx) {

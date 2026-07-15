@@ -11,6 +11,8 @@ import path from 'node:path';
 import { TOOL, SEVERITY, CONFIDENCE, CATEGORY } from '../constants.js';
 import { createFinding } from '../core/finding.js';
 import { redactSecret } from './base.js';
+import { commandExists } from '../core/runner.js';
+import { getDownloadedBinary } from '../core/binary-download.js';
 
 function severityForRule(ruleId) {
   const id = String(ruleId || '').toLowerCase();
@@ -31,6 +33,13 @@ const adapter = {
     go: 'go install github.com/gitleaks/gitleaks/v8@latest',
     recommended: 'brew install gitleaks  (or download a release binary)',
     url: 'https://github.com/gitleaks/gitleaks#installing',
+  },
+
+  async locate() {
+    const downloaded = getDownloadedBinary('gitleaks');
+    if (downloaded) return { command: downloaded };
+    if (await commandExists('gitleaks')) return { command: 'gitleaks' };
+    return null;
   },
 
   buildInvocation(ctx) {

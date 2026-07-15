@@ -12,6 +12,8 @@
 import { TOOL, SEVERITY, CONFIDENCE, CATEGORY } from '../constants.js';
 import { createFinding } from '../core/finding.js';
 import { parseJsonlSafe, redactSecret } from './base.js';
+import { commandExists } from '../core/runner.js';
+import { getDownloadedBinary } from '../core/binary-download.js';
 
 function extractLocation(record) {
   const data = record?.SourceMetadata?.Data || {};
@@ -34,6 +36,13 @@ const adapter = {
     go: 'go install github.com/trufflesecurity/trufflehog/v3@latest',
     recommended: 'brew install trufflehog  (or download a release binary)',
     url: 'https://github.com/trufflesecurity/trufflehog#installation',
+  },
+
+  async locate() {
+    const downloaded = getDownloadedBinary('trufflehog');
+    if (downloaded) return { command: downloaded };
+    if (await commandExists('trufflehog')) return { command: 'trufflehog' };
+    return null;
   },
 
   buildInvocation(ctx) {

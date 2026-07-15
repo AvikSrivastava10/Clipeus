@@ -23,6 +23,7 @@ import { detectProject } from '../detectors/detect.js';
 import { resolveToolInEnvironments } from '../detectors/environments.js';
 import { loadConfig } from '../config/config.js';
 import { ensureGitignore } from '../config/gitignore.js';
+import { downloadTool, DOWNLOAD_DESCRIPTORS } from '../core/binary-download.js';
 import { enableHook } from '../hooks/git-hook.js';
 import { confirm, isInteractive } from '../core/prompt.js';
 import { log, spinner, chalk } from '../core/logger.js';
@@ -165,12 +166,38 @@ export async function initCommand(opts = {}) {
     }
 
     log.warn(`${id} is not installed.`);
-    const candidates = await candidateInstallers(adapter.install, { pythonEnvs: detection.pythonEnvs });
 
     if (!interactive) {
       log.info(chalk.gray(`   install with: ${installHint(adapter)}`));
       continue;
     }
+
+    // If this tool has a binary-download descriptor, offer that as the primary
+    // path — no Go/Homebrew/Chocolatey needed, just an internet connection.
+    if (DOWNLOAD_DESCRIPTORS[id]) {
+      const yes = await confirm(`Download ${id} binary (no dependencies needed)?`, true);
+      if (yes) {
+        const sp = spinner(`Downloading ${id}...`);
+        const dlResult = await downloadTool(id, {
+          onProgress: (msg) => { sp.text = msg; },
+        });
+        if (dlResult.ok) {
+          sp.succeed(`Installed ${id} v${dlResult.version} (downloaded to ~/.clipeus/bin/).`);
+          continue;
+        } else {
+          sp.fail(`Download failed: ${dlResult.error}`);
+          log.info(chalk.gray(`   You can also install manually: ${installHint(adapter)}`));
+          continue;
+        }
+      } else {
+        log.info(chalk.gray(`   skipped. Install later with \`clipeus init\` or manually: ${installHint(adapter)}`));
+        continue;
+      }
+    }
+
+    // For non-downloadable tools, try package-manager candidates.
+    const candidates = await candidateInstallers(adapter.install, { pythonEnvs: detection.pythonEnvs });
+
     if (candidates.length === 0) {
       const blocked = await missingPrereqs(adapter.install);
       if (blocked.length) {
