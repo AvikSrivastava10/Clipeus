@@ -56,7 +56,7 @@ const adapter = {
     if (ctx.config?.gitleaks?.noGit) args.push('--no-git');
 
     return {
-      command: 'gitleaks',
+      command: ctx.resolvedCommand || 'gitleaks',
       args,
       cwd: ctx.root,
       output: { type: 'file', path: reportPath, cleanup: true },

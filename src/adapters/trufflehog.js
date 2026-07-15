@@ -52,7 +52,7 @@ const adapter = {
       args.push('--no-verification');
     }
     return {
-      command: 'trufflehog',
+      command: ctx.resolvedCommand || 'trufflehog',
       args,
       cwd: ctx.root,
       output: { type: 'stdout' },

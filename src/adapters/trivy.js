@@ -41,7 +41,7 @@ const adapter = {
     }
     args.push('.');
     return {
-      command: 'trivy',
+      command: ctx.resolvedCommand || 'trivy',
       args,
       cwd: ctx.root,
       output: { type: 'stdout' },
