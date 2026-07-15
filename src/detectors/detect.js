@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { TOOL } from '../constants.js';
 import { walk, listTopLevel } from '../core/fswalk.js';
+import { findPythonEnvironments } from './environments.js';
 import { log } from '../core/logger.js';
 
 /** Extensions that count as "source files" for the always-on Semgrep pass. */
@@ -77,10 +78,17 @@ export function detectProject(root, opts = {}) {
   };
   const meta = {
     npmLockfile: null,
+    npmLockfiles: [],
+    npmLockfileDir: null,
     k8sManifests: [],
     fileCount: 0,
     nodeConstraint: detectNodeConstraint(abs),
   };
+
+  // Absolute locations captured during the walk, used to locate modules/lockfiles
+  // that may live in a subfolder rather than the project root.
+  const npmLockfilePaths = [];
+  const packageJsonDirs = new Set();
 
   // .git may be a directory (normal) or a file (worktrees/submodules).
   if (fs.existsSync(path.join(abs, '.git'))) {
@@ -107,8 +115,14 @@ export function detectProject(root, opts = {}) {
     if (SOURCE_EXTENSIONS.has(ext)) hasSourceFiles = true;
 
     // Node
-    if (base === 'package.json') markers.node.push(rel(abs, file));
-    if (NPM_LOCKFILES.includes(base) && !meta.npmLockfile) meta.npmLockfile = base;
+    if (base === 'package.json') {
+      markers.node.push(rel(abs, file));
+      packageJsonDirs.add(path.dirname(file));
+    }
+    if (NPM_LOCKFILES.includes(base)) {
+      if (!meta.npmLockfile) meta.npmLockfile = base;
+      npmLockfilePaths.push(file);
+    }
 
     // Python
     if (['requirements.txt', 'Pipfile', 'pyproject.toml', 'setup.py', 'setup.cfg'].includes(base)) {
@@ -170,7 +184,18 @@ export function detectProject(root, opts = {}) {
 
   const enabledTools = computeEnabledTools(stacks, hasSourceFiles);
 
-  return { root: abs, stacks, languages, markers, enabledTools, hasSourceFiles, meta };
+  // Where Node lockfiles actually live (they may be in a subfolder, not root).
+  meta.npmLockfiles = npmLockfilePaths.map((p) => rel(abs, p));
+  meta.npmLockfileDir = npmLockfilePaths.length ? path.dirname(npmLockfilePaths[0]) : null;
+  const nodeModuleDirs = [...packageJsonDirs];
+
+  // Python virtualenvs anywhere in the main layout (root or a subfolder).
+  const pythonEnvs = stacks.python ? findPythonEnvironments(abs) : [];
+
+  return {
+    root: abs, stacks, languages, markers, enabledTools, hasSourceFiles, meta,
+    nodeModuleDirs, pythonEnvs,
+  };
 }
 
 /** Map detected stacks to the external tool ids that should run. */
