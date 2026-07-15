@@ -31,6 +31,18 @@ function npmAuditDir(ctx) {
   return root;
 }
 
+/**
+ * Path of the audited package.json relative to the scan root, so findings in a
+ * subfolder read e.g. "frontend/package.json" rather than a bare "package.json".
+ * Falls back to "package.json" when there is no ctx/root (e.g. unit tests that
+ * call normalize directly).
+ */
+function npmManifestRel(ctx) {
+  if (!ctx?.root) return 'package.json';
+  const rel = path.relative(ctx.root, npmAuditDir(ctx)).replace(/\\/g, '/');
+  return rel ? `${rel}/package.json` : 'package.json';
+}
+
 const adapter = {
   id: TOOL.npmAudit,
   displayName: 'npm audit',
@@ -65,19 +77,20 @@ const adapter = {
     };
   },
 
-  normalize(parsed) {
+  normalize(parsed, ctx) {
     if (!parsed || typeof parsed !== 'object') return [];
+    const manifest = npmManifestRel(ctx);
     if (parsed.vulnerabilities && typeof parsed.vulnerabilities === 'object') {
-      return normalizeV7(parsed);
+      return normalizeV7(parsed, manifest);
     }
     if (parsed.advisories && typeof parsed.advisories === 'object') {
-      return normalizeV6(parsed);
+      return normalizeV6(parsed, manifest);
     }
     return [];
   },
 };
 
-function normalizeV7(parsed) {
+function normalizeV7(parsed, manifest = 'package.json') {
   const findings = [];
   const seen = new Set();
 
@@ -96,7 +109,7 @@ function normalizeV7(parsed) {
           ruleId: `npm-audit.${pkgName}`,
           severity: normalizeSeverity(vuln.severity),
           category: CATEGORY.dependencyCve,
-          file: 'package.json',
+          file: manifest,
           line: null,
           message: `Vulnerable dependency "${pkgName}"${vuln.range ? ` (affected: ${vuln.range})` : ''}.`,
           confidence: CONFIDENCE.high,
@@ -118,7 +131,7 @@ function normalizeV7(parsed) {
           ruleId: ghsa || `npm-audit.${adv.source || pkgName}`,
           severity: normalizeSeverity(adv.severity || vuln.severity),
           category: CATEGORY.dependencyCve,
-          file: 'package.json',
+          file: manifest,
           line: null,
           message: `${adv.title || 'Known vulnerability'} in "${pkgName}"${adv.range ? ` (affected: ${adv.range})` : ''}.`,
           confidence: CONFIDENCE.high,
@@ -132,7 +145,7 @@ function normalizeV7(parsed) {
   return findings;
 }
 
-function normalizeV6(parsed) {
+function normalizeV6(parsed, manifest = 'package.json') {
   const findings = [];
   for (const adv of Object.values(parsed.advisories)) {
     findings.push(
@@ -141,7 +154,7 @@ function normalizeV6(parsed) {
         ruleId: adv.github_advisory_id || `npm-audit.${adv.id}`,
         severity: normalizeSeverity(adv.severity),
         category: CATEGORY.dependencyCve,
-        file: 'package.json',
+        file: manifest,
         line: null,
         message: `${adv.title || 'Known vulnerability'} in "${adv.module_name}"${adv.vulnerable_versions ? ` (affected: ${adv.vulnerable_versions})` : ''}.`,
         confidence: CONFIDENCE.high,
