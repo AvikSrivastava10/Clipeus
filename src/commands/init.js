@@ -254,7 +254,9 @@ export async function initCommand(opts = {}) {
   if (detection.stacks.git) {
     const gi = ensureGitignore(root);
     if (gi.changed) {
-      log.success(`${gi.created ? 'Created' : 'Updated'} .gitignore (${gi.added.join(', ')}).`);
+      log.success(`Updated .gitignore (${gi.added.join(', ')}).`);
+    } else if (!gi.present) {
+      log.info(chalk.gray('   no .gitignore found — skipping (create one and re-run init if you want Clipeus entries added).'));
     } else if (gi.error) {
       log.info(chalk.gray(`   could not update .gitignore: ${gi.error}`));
     }
