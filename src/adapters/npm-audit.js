@@ -18,6 +18,19 @@ function ghsaFromUrl(url) {
   return m ? m[0] : null;
 }
 
+/**
+ * Directory to run `npm audit` in. Prefers the folder where an npm lockfile
+ * actually lives (it may be a subfolder such as frontend/), falling back to the
+ * scan root.
+ */
+function npmAuditDir(ctx) {
+  const root = ctx.root;
+  const lockfiles = ctx.detection?.meta?.npmLockfiles || [];
+  const npmLock = lockfiles.find((r) => /(^|\/)(package-lock\.json|npm-shrinkwrap\.json)$/.test(r));
+  if (npmLock) return path.resolve(root, path.dirname(npmLock));
+  return root;
+}
+
 const adapter = {
   id: TOOL.npmAudit,
   displayName: 'npm audit',
@@ -31,12 +44,13 @@ const adapter = {
   },
 
   precheck(ctx) {
+    const dir = npmAuditDir(ctx);
     const hasLock = ['package-lock.json', 'npm-shrinkwrap.json'].some((f) =>
-      fs.existsSync(path.join(ctx.root, f)),
+      fs.existsSync(path.join(dir, f)),
     );
-    const hasModules = fs.existsSync(path.join(ctx.root, 'node_modules'));
+    const hasModules = fs.existsSync(path.join(dir, 'node_modules'));
     if (!hasLock && !hasModules) {
-      return { skip: true, reason: 'no package-lock.json/node_modules (run `npm install` first)' };
+      return { skip: true, reason: 'no package-lock.json/node_modules found (run `npm install` first)' };
     }
     return { skip: false };
   },
@@ -46,7 +60,7 @@ const adapter = {
       command: 'npm',
       // --json machine output; audit is inherently read-only (never `npm audit fix`).
       args: ['audit', '--json'],
-      cwd: ctx.root,
+      cwd: npmAuditDir(ctx),
       output: { type: 'stdout' },
     };
   },

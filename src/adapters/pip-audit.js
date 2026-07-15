@@ -6,21 +6,31 @@
  * skip (rather than auditing an unrelated ambient environment).
  */
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { TOOL, SEVERITY, CONFIDENCE, CATEGORY } from '../constants.js';
 import { createFinding } from '../core/finding.js';
 import { normalizeSeverity } from './base.js';
+import { walk } from '../core/fswalk.js';
+import { commandExists } from '../core/runner.js';
+import { resolveToolInEnvironments, venvPathEnv } from '../detectors/environments.js';
 
-/** Find requirements-style files at the project root. */
+/**
+ * Find requirements*.txt files anywhere in the main project layout, returned as
+ * POSIX paths relative to `root` (so pip-audit can be invoked from the root even
+ * when the files live in a subfolder like backend/). The shared walker already
+ * skips venv/site-packages/node_modules dirs.
+ */
 function findRequirements(root) {
-  let entries = [];
   try {
-    entries = fs.readdirSync(root);
+    const abs = walk(root, {
+      maxDepth: 4,
+      maxFiles: 2000,
+      nameFilter: (n) => /^requirements.*\.txt$/i.test(n),
+    });
+    return abs.map((p) => path.relative(root, p).replace(/\\/g, '/'));
   } catch {
     return [];
   }
-  return entries.filter((f) => /^requirements.*\.txt$/i.test(f));
 }
 
 function referencesFor(vuln) {
@@ -46,12 +56,20 @@ const adapter = {
     url: 'https://github.com/pypa/pip-audit#installation',
   },
 
+  async locate(ctx) {
+    // Prefer pip-audit from the project's virtualenv; fall back to a global one.
+    const viaVenv = resolveToolInEnvironments(ctx.detection?.pythonEnvs || [], 'pip-audit');
+    if (viaVenv) return { command: viaVenv.command, env: venvPathEnv(viaVenv.env) };
+    if (await commandExists('pip-audit')) return { command: 'pip-audit' };
+    return null;
+  },
+
   precheck(ctx) {
     const reqs = findRequirements(ctx.root);
     if (reqs.length === 0) {
       return {
         skip: true,
-        reason: 'no requirements*.txt found at project root',
+        reason: 'no requirements*.txt found in the project',
       };
     }
     return { skip: false };
@@ -64,12 +82,10 @@ const adapter = {
       args.push('-r', r);
     }
     return {
-      command: 'pip-audit',
+      command: ctx.resolvedCommand || 'pip-audit',
       args,
       cwd: ctx.root,
       output: { type: 'stdout' },
-      // Store which file(s) we scanned for message context.
-      _requirements: reqs,
     };
   },
 

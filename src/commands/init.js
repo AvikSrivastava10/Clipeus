@@ -19,6 +19,7 @@ import { ALL_ADAPTERS, getAdapter } from '../adapters/index.js';
 import { commandExists, runTool } from '../core/runner.js';
 import { installHint } from '../adapters/base.js';
 import { detectProject } from '../detectors/detect.js';
+import { resolveToolInEnvironments } from '../detectors/environments.js';
 import { loadConfig } from '../config/config.js';
 import { enableHook } from '../hooks/git-hook.js';
 import { confirm, isInteractive } from '../core/prompt.js';
@@ -47,11 +48,17 @@ function curatedConfig() {
 }
 
 /** Determine runnable install candidates for a tool, in priority order. */
-async function candidateInstallers(install = {}) {
+async function candidateInstallers(install = {}, opts = {}) {
   const out = [];
   if (install.pip) {
     const pkg = install.pip.replace(/^pip3?\s+install\s+/i, '').trim().split(/\s+/)[0];
     if (pkg) {
+      // Prefer the project's virtualenv so the install lands where the project
+      // (and later Clipeus runs) actually look for it.
+      const venv = (opts.pythonEnvs || [])[0];
+      if (venv?.python) {
+        out.push({ command: venv.python, args: ['-m', 'pip', 'install', pkg], display: `${venv.source}: pip install ${pkg}` });
+      }
       if (await commandExists('pip3')) out.push({ command: 'pip3', args: ['install', pkg], display: `pip3 install ${pkg}` });
       else if (await commandExists('pip')) out.push({ command: 'pip', args: ['install', pkg], display: `pip install ${pkg}` });
       else if (await commandExists('python')) out.push({ command: 'python', args: ['-m', 'pip', 'install', pkg], display: `python -m pip install ${pkg}` });
@@ -70,6 +77,12 @@ async function candidateInstallers(install = {}) {
     out.push({ command: parts[0], args: parts.slice(1), display: install.npm });
   }
   return out;
+}
+
+/** Whether a tool is available, honoring the project's virtualenv(s). */
+async function toolAvailable(adapter, detection) {
+  if (resolveToolInEnvironments(detection?.pythonEnvs || [], adapter.command)) return true;
+  return commandExists(adapter.command);
 }
 
 /**
@@ -143,14 +156,14 @@ export async function initCommand(opts = {}) {
       log.success(`${id} is bundled with ${PRODUCT}.`);
       continue;
     }
-    const exists = await commandExists(adapter.command);
+    const exists = await toolAvailable(adapter, detection);
     if (exists) {
       log.success(`${id} is installed.`);
       continue;
     }
 
     log.warn(`${id} is not installed.`);
-    const candidates = await candidateInstallers(adapter.install);
+    const candidates = await candidateInstallers(adapter.install, { pythonEnvs: detection.pythonEnvs });
 
     if (!interactive) {
       log.info(chalk.gray(`   install with: ${installHint(adapter)}`));
@@ -182,7 +195,7 @@ export async function initCommand(opts = {}) {
 
     const sp = spinner(`Installing ${id}...`);
     const res = await runTool({ command: chosen.command, args: chosen.args, timeoutMs: 300000, cwd: root });
-    if (res.ok && (await commandExists(adapter.command))) {
+    if (res.ok && (await toolAvailable(adapter, detection))) {
       sp.succeed(`Installed ${id}.`);
     } else {
       sp.fail(`Could not install ${id} automatically.`);

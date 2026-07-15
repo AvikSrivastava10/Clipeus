@@ -6,10 +6,12 @@
  * of the current directory would run.
  */
 
+import path from 'node:path';
 import { ALL_ADAPTERS } from '../adapters/index.js';
 import { commandExists, getToolVersion, runTool } from '../core/runner.js';
 import { installHint } from '../adapters/base.js';
 import { detectProject } from '../detectors/detect.js';
+import { resolveToolInEnvironments } from '../detectors/environments.js';
 import { selectAnalyzers } from '../scan/engine.js';
 import { loadConfig } from '../config/config.js';
 import { log, chalk } from '../core/logger.js';
@@ -39,6 +41,10 @@ export async function doctorCommand(opts = {}) {
   out.push(`  ${npm ? chalk.green('✓') : chalk.red('✗')} npm ${chalk.gray(npm || 'not found')}`);
   out.push('');
 
+  // Detect the project once up front so tool availability can honor virtualenvs.
+  const root = process.cwd();
+  const detection = detectProject(root);
+
   // Security tools
   out.push(chalk.bold('Security tools'));
   let missing = 0;
@@ -58,10 +64,14 @@ export async function doctorCommand(opts = {}) {
       continue;
     }
 
-    const exists = await commandExists(adapter.command);
+    // Honor the project's virtualenv(s) for Python tools before a PATH lookup.
+    const viaVenv = resolveToolInEnvironments(detection.pythonEnvs || [], adapter.command);
+    const resolvedCmd = viaVenv ? viaVenv.command : adapter.command;
+    const exists = viaVenv ? true : await commandExists(adapter.command);
     if (exists) {
-      const version = await getToolVersion(adapter.command, adapter.versionArgs);
-      out.push(`  ${chalk.green('✓')} ${adapter.id.padEnd(22)} ${chalk.gray(version || 'installed')}`);
+      const version = await getToolVersion(resolvedCmd, adapter.versionArgs);
+      const where = viaVenv ? chalk.gray(`  [${viaVenv.env.source}]`) : '';
+      out.push(`  ${chalk.green('✓')} ${adapter.id.padEnd(22)} ${chalk.gray(version || 'installed')}${where}`);
     } else {
       missing += 1;
       out.push(
@@ -74,9 +84,7 @@ export async function doctorCommand(opts = {}) {
 
   // What a scan here would run
   try {
-    const root = process.cwd();
     const { config } = loadConfig(root);
-    const detection = detectProject(root);
     const { toolSet, checkerSet } = selectAnalyzers({ detection, config });
     const stacks = Object.entries(detection.stacks).filter(([, v]) => v).map(([k]) => k);
     out.push(chalk.bold('Current project'));
@@ -84,6 +92,13 @@ export async function doctorCommand(opts = {}) {
     out.push(`  ${chalk.gray('detected:')} ${stacks.length ? stacks.join(', ') : 'unknown'}`);
     const selected = [...toolSet, ...checkerSet];
     out.push(`  ${chalk.gray('would run:')} ${selected.length ? selected.join(', ') : '(nothing detected)'}`);
+    if (detection.nodeModuleDirs?.length) {
+      const rels = detection.nodeModuleDirs.map((d) => path.relative(root, d).replace(/\\/g, '/') || '.');
+      out.push(`  ${chalk.gray('node modules:')} ${rels.join(', ')}`);
+    }
+    if (detection.pythonEnvs?.length) {
+      out.push(`  ${chalk.gray('python envs:')} ${detection.pythonEnvs.map((e) => e.source).join(', ')}`);
+    }
     out.push('');
   } catch (err) {
     log.debug(`doctor project detection failed: ${err.message}`);

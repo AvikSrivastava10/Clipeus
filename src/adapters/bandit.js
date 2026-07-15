@@ -8,6 +8,8 @@
 import { TOOL, SEVERITY, CONFIDENCE, CATEGORY } from '../constants.js';
 import { createFinding } from '../core/finding.js';
 import { normalizeSeverity, inferCategory } from './base.js';
+import { commandExists } from '../core/runner.js';
+import { resolveToolInEnvironments, venvPathEnv } from '../detectors/environments.js';
 
 /** Bandit confidence (HIGH/MEDIUM/LOW) -> unified confidence. */
 function mapConfidence(value) {
@@ -74,9 +76,17 @@ const adapter = {
     url: 'https://bandit.readthedocs.io/en/latest/start.html',
   },
 
+  async locate(ctx) {
+    // Prefer bandit from the project's virtualenv; fall back to a global one.
+    const viaVenv = resolveToolInEnvironments(ctx.detection?.pythonEnvs || [], 'bandit');
+    if (viaVenv) return { command: viaVenv.command, env: venvPathEnv(viaVenv.env) };
+    if (await commandExists('bandit')) return { command: 'bandit' };
+    return null;
+  },
+
   buildInvocation(ctx) {
     return {
-      command: 'bandit',
+      command: ctx.resolvedCommand || 'bandit',
       args: [
         '-r', '.',
         '-f', 'json',

@@ -22,6 +22,10 @@
  * @property {(text:string, ctx:object)=>any} [parse]  Raw text -> parsed payload.
  * @property {(parsed:any, ctx:object)=>object[]} normalize  Parsed -> Finding[].
  * @property {(ctx:object)=>Promise<object>} [runCustom]  Fully custom runner.
+ * @property {(ctx:object)=>Promise<{command:string,env?:object}|null>} [locate]
+ *   Resolve the executable to run (e.g. a project virtualenv binary). Returning
+ *   null means "not installed" (adapter is skipped). When absent, availability
+ *   falls back to a PATH lookup of `command`.
  */
 
 import fs from 'node:fs';
@@ -229,8 +233,25 @@ export async function runAdapter(adapter, ctx) {
       };
     }
 
-    const available = await commandExists(adapter.command);
-    if (!available) {
+    // Resolve the executable. Adapters may implement `locate(ctx)` to point at a
+    // project-local install (e.g. a Python virtualenv); otherwise we fall back
+    // to a PATH lookup of adapter.command.
+    let resolvedCommand = adapter.command;
+    let resolvedEnv;
+    if (typeof adapter.locate === 'function') {
+      const located = await adapter.locate(ctx);
+      if (!located) {
+        return {
+          ...result,
+          status: STATUS.skipped,
+          reason: `${adapter.command} is not installed`,
+          installHint: installHint(adapter),
+          durationMs: Date.now() - started,
+        };
+      }
+      resolvedCommand = located.command || adapter.command;
+      resolvedEnv = located.env;
+    } else if (!(await commandExists(adapter.command))) {
       return {
         ...result,
         status: STATUS.skipped,
@@ -253,15 +274,17 @@ export async function runAdapter(adapter, ctx) {
       }
     }
 
-    result.version = await getToolVersion(adapter.command, adapter.versionArgs);
+    result.version = await getToolVersion(resolvedCommand, adapter.versionArgs);
 
-    const invocation = adapter.buildInvocation(ctx);
+    const invocation = adapter.buildInvocation({ ...ctx, resolvedCommand, resolvedEnv });
+    const mergedEnv =
+      resolvedEnv || invocation.env ? { ...resolvedEnv, ...invocation.env } : undefined;
     const runResult = await runTool({
-      command: invocation.command ?? adapter.command,
+      command: invocation.command ?? resolvedCommand,
       args: invocation.args ?? [],
       cwd: invocation.cwd ?? ctx.root,
       timeoutMs: invocation.timeoutMs ?? ctx.config?.toolTimeoutMs,
-      env: invocation.env,
+      env: mergedEnv,
       input: invocation.input,
     });
     result.rawExitCode = runResult.exitCode;
