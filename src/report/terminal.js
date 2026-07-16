@@ -143,6 +143,9 @@ export function render(scan, opts = {}) {
   if (scan.vendoredFilteredCount > 0) {
     out.push(chalk.gray(`  ${scan.vendoredFilteredCount} in vendored dirs (node_modules, .venv, …) hidden`));
   }
+  if (scan.dataFileDemotedCount > 0) {
+    out.push(chalk.gray(`  ${scan.dataFileDemotedCount} secret hit(s) in data files demoted to low (likely dataset noise)`));
+  }
   if (scan.minConfidenceFiltered > 0) {
     out.push(chalk.gray(`  ${scan.minConfidenceFiltered} below --min-confidence=${scan.minConfidence} hidden`));
   }

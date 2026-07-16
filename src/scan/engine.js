@@ -29,6 +29,7 @@ import { applyInlineSuppressions } from '../config/inline-suppress.js';
 import { loadBaseline, writeBaseline, partitionByBaseline } from '../config/baseline.js';
 import { deduplicate, sortFindings, summarize } from '../core/dedup.js';
 import { filterVendoredFindings } from '../core/vendored.js';
+import { demoteDataFileSecrets } from '../core/data-files.js';
 import { meetsSeverityThreshold } from '../core/finding.js';
 import { CONFIDENCE_ORDER } from '../constants.js';
 import { log } from '../core/logger.js';
@@ -256,9 +257,13 @@ export async function runScan(options = {}) {
   const { kept: afterInline, suppressed: inlineSuppressed } = applyInlineSuppressions(afterIgnore, root);
   // 4) deduplicate across tools
   const { findings: deduped, duplicatesRemoved } = deduplicate(afterInline);
+  // 4b) auto-demote low-certainty secret hits inside data files (CSV/Parquet/…).
+  //     Almost always dataset noise, not credentials — demoted (not hidden) so a
+  //     genuine leak in an exported data file is still on record.
+  const { findings: afterDemote, demoted: dataFileDemotedCount } = demoteDataFileSecrets(deduped);
 
   // 5) optional minimum-confidence filter (reduce heuristic noise)
-  let current = deduped;
+  let current = afterDemote;
   let minConfidenceFiltered = 0;
   const minConfidence = options.minConfidence ? String(options.minConfidence).toLowerCase() : null;
   if (minConfidence && CONFIDENCE_ORDER[minConfidence]) {
@@ -313,6 +318,7 @@ export async function runScan(options = {}) {
     suppressedCount: ignoreSuppressed.length + inlineSuppressed.length,
     inlineSuppressedCount: inlineSuppressed.length,
     vendoredFilteredCount: vendoredFindings.length,
+    dataFileDemotedCount,
     duplicatesRemoved,
     minConfidence,
     minConfidenceFiltered,
