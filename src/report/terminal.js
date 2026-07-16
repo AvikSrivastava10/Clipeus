@@ -149,6 +149,9 @@ export function render(scan, opts = {}) {
   if (scan.dataFileIgnoredCount > 0) {
     out.push(chalk.gray(`  ${scan.dataFileIgnoredCount} secret hit(s) in data files ignored (secrets.dataFiles=ignore)`));
   }
+  if (scan.testAssertSuppressedCount > 0) {
+    out.push(chalk.gray(`  ${scan.testAssertSuppressedCount} assert(s) in test files hidden (bandit B101)`));
+  }
   if (scan.minConfidenceFiltered > 0) {
     out.push(chalk.gray(`  ${scan.minConfidenceFiltered} below --min-confidence=${scan.minConfidence} hidden`));
   }

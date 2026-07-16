@@ -30,6 +30,7 @@ import { loadBaseline, writeBaseline, partitionByBaseline } from '../config/base
 import { deduplicate, sortFindings, summarize } from '../core/dedup.js';
 import { filterVendoredFindings } from '../core/vendored.js';
 import { applyDataFileSecretPolicy } from '../core/data-files.js';
+import { suppressTestAssertNoise } from '../core/test-files.js';
 import { meetsSeverityThreshold } from '../core/finding.js';
 import { CONFIDENCE_ORDER } from '../constants.js';
 import { log } from '../core/logger.js';
@@ -267,9 +268,13 @@ export async function runScan(options = {}) {
     demoted: dataFileDemotedCount,
     ignored: dataFileIgnoredCount,
   } = applyDataFileSecretPolicy(deduped, dataFilePolicy);
+  // 4c) suppress bandit assert_used (B101) noise inside test files — asserts are
+  //     the point of tests, never a vulnerability.
+  const { findings: afterTestNoise, suppressed: testAssertSuppressedCount } =
+    suppressTestAssertNoise(afterDemote);
 
   // 5) optional minimum-confidence filter (reduce heuristic noise)
-  let current = afterDemote;
+  let current = afterTestNoise;
   let minConfidenceFiltered = 0;
   const minConfidence = options.minConfidence ? String(options.minConfidence).toLowerCase() : null;
   if (minConfidence && CONFIDENCE_ORDER[minConfidence]) {
@@ -326,6 +331,7 @@ export async function runScan(options = {}) {
     vendoredFilteredCount: vendoredFindings.length,
     dataFileDemotedCount,
     dataFileIgnoredCount,
+    testAssertSuppressedCount,
     duplicatesRemoved,
     minConfidence,
     minConfidenceFiltered,
